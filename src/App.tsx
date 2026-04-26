@@ -103,6 +103,18 @@ function LaborImageRow() {
 function App() {
   return (
     <div className="app">
+      <div className="desktop-gate" role="alert" aria-live="polite">
+        <div className="desktop-gate__card">
+          <p className="desktop-gate__title">Vista solo para escritorio</p>
+          <p className="desktop-gate__text">
+            Esta web está pensada para pantallas anchas (a partir de portátiles de unos
+            13&quot;). Ábrela en un ordenador o amplía la ventana del navegador para verla
+            correctamente; aún no hay versión móvil.
+          </p>
+        </div>
+      </div>
+
+      <div className="app__desktop-only">
       <header className="site-top">
         <div className="site-top__ig">
           <a
@@ -120,6 +132,7 @@ function App() {
           <a href="#inicio">Inicio</a>
           <a href="#muestra">Muestra</a>
           <a href="#labor">Labor</a>
+          <a href="#talleres">Talleres</a>
           <a href="#contacto">Contacto</a>
         </nav>
       </header>
@@ -187,6 +200,20 @@ function App() {
             <p>Aquí va el texto.</p>
           </div>
         </div>
+      </section>
+
+      <section
+        className="section talleres"
+        id="talleres"
+        aria-labelledby="talleres-title"
+      >
+        <h2 id="talleres-title" className="labor__title">
+          Talleres
+        </h2>
+        <p className="talleres__lede">
+          Clases, quemas experimentales y encuentros en el estudio. Aquí puedes
+          añadir fechas, modalidades o cómo inscribirse.
+        </p>
       </section>
 
       <div className="section split split--stack split--reverse">
@@ -324,6 +351,7 @@ function App() {
         <div className="footer-links">
           <a href="#inicio">Inicio</a>
           <a href="#muestra">Muestra</a>
+          <a href="#talleres">Talleres</a>
           <a href="#contacto">Contacto</a>
           <a
             href={INSTAGRAM_URL}
@@ -435,6 +463,7 @@ function App() {
           Portfolio — Enzo Federico
         </a>
       </aside>
+      </div>
     </div>
   );
 }
