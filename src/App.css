@@ -98,7 +98,8 @@ a:hover {
   z-index: 1;
 }
 
-/* Viewport menor a 1280px: cartel; sitio pensado para portátil ~13" en adelante */
+/* Viewport < 800px: cartel (móvil muy estrecho). Desde ~800px: vista escritorio
+   (tablets ~10", ventana de vista previa en el editor, portátiles pequeños). */
 .desktop-gate {
   display: none;
 }
@@ -107,7 +108,7 @@ a:hover {
   min-height: 100%;
 }
 
-@media (max-width: 1279.98px) {
+@media (max-width: 799.98px) {
   html,
   body {
     overflow: hidden;
@@ -685,16 +686,16 @@ a:hover {
   gap: clamp(0.75rem, 2vw, 1.1rem);
 }
 
-/* Una sola foto ancha (misma base que Labor sin el trío) */
+/* Una sola foto: proporción natural (cuadrado); evita recorte tipo panorámico */
 .split--stack > .split__img {
-  max-width: min(100%, 580px);
+  max-width: min(100%, calc(580px * 1.2));
   width: 100%;
   margin-inline: auto;
-  aspect-ratio: 2.2 / 1;
-  max-height: min(44vh, 420px);
+  aspect-ratio: 1;
+  max-height: min(70vw, calc(580px * 1.2));
 }
 
-/* Tres fotos (aleatorias) en fila, centradas — Labor (más grandes) */
+/* Tres fotos (aleatorias) en fila — Labor (15% + 20% sobre medidas base) */
 .split--stack .split__stack-row {
   display: flex;
   flex-wrap: nowrap;
@@ -702,7 +703,7 @@ a:hover {
   align-items: stretch;
   gap: clamp(0.45rem, 1.6vw, 0.65rem);
   width: 100%;
-  max-width: min(100%, 620px);
+  max-width: min(100%, calc(620px * 1.15 * 1.2));
   margin-inline: auto;
 }
 
@@ -710,7 +711,7 @@ a:hover {
   flex: 1 1 0;
   min-width: 0;
   max-width: none;
-  max-height: min(34vh, 240px);
+  max-height: min(calc(34vh * 1.15 * 1.2), calc(240px * 1.15 * 1.2));
   width: 100%;
   aspect-ratio: 1;
   margin-inline: 0;
@@ -926,6 +927,14 @@ a:hover {
   margin: 0;
   padding: 0 0 clamp(2.5rem, 4vw, 3.5rem);
   box-sizing: border-box;
+}
+
+/* Dentro de La muestra: compensar padding lateral de .showcase (igual que .showcase__contact) */
+.showcase > .bento {
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  width: auto;
+  max-width: none;
 }
 
 .bento__grid {

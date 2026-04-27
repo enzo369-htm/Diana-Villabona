@@ -105,11 +105,12 @@ function App() {
     <div className="app">
       <div className="desktop-gate" role="alert" aria-live="polite">
         <div className="desktop-gate__card">
-          <p className="desktop-gate__title">Vista solo para escritorio</p>
+          <p className="desktop-gate__title">Pantalla muy estrecha</p>
           <p className="desktop-gate__text">
-            Esta web está pensada para pantallas anchas (a partir de portátiles de unos
-            13&quot;). Ábrela en un ordenador o amplía la ventana del navegador para verla
-            correctamente; aún no hay versión móvil.
+            La maquetación está pensada a partir de unos 800&nbsp;pixels de ancho (tablets
+            ~10&quot; en horizontal, ventana amplia o vista previa del navegador en el
+            editor). Amplía la ventana o gira el dispositivo para verla; en móviles muy
+            estrechos aún no hay versión adaptada.
           </p>
         </div>
       </div>
@@ -185,20 +186,84 @@ function App() {
       </section>
 
       <section
-        className="section labor"
-        id="labor"
-        aria-labelledby="labor-title"
+        className="showcase"
+        id="muestra"
+        aria-labelledby="muestra-title"
       >
-        <h2 id="labor-title" className="labor__title">
-          Labor
-        </h2>
-        <div className="split split--stack labor__inner">
-          <LaborImageRow />
-          <div className="split__text">
-            <span className="split__kicker">Aquí: etiqueta</span>
-            <h2>Aquí: título</h2>
-            <p>Aquí va el texto.</p>
+        <h2 id="muestra-title">La muestra</h2>
+        <div className="showcase__stacks" role="list">
+          {showcaseItems.map((item) => (
+            <div
+              className="split split--stack showcase-stack"
+              key={item.title}
+              role="listitem"
+            >
+              <div className="split__img">
+                <img
+                  src={item.img}
+                  alt=""
+                  width={600}
+                  height={600}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div className="split__text">
+                <span className="split__kicker">{item.tag}</span>
+                <h3>{item.title}</h3>
+                <p>{item.note}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="bento" aria-label="Ejes de trabajo">
+          <div className="bento__grid">
+            <div className="bento__cell bento__cell--img">
+              <img
+                className="bento__image"
+                src={IMAGES.revelado}
+                alt=""
+                width={400}
+                height={400}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="bento__cell">
+              <p className="bento__label">Modelado</p>
+            </div>
+            <div className="bento__cell bento__cell--img">
+              <img
+                className="bento__image"
+                src={IMAGES.podcast}
+                alt=""
+                width={400}
+                height={400}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="bento__cell">
+              <p className="bento__label">Esmalte &amp; prueba</p>
+            </div>
+            <div className="bento__cell bento__cell--img">
+              <img
+                className="bento__image"
+                src={IMAGES.reveladoCopia}
+                alt=""
+                width={400}
+                height={400}
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div className="bento__cell">
+              <p className="bento__label">Comunidad</p>
+            </div>
           </div>
+        </div>
+        <div className="showcase__contact" id="contacto">
+          <p>Hacemos encuentros, residencias breves y talleres por nodo</p>
         </div>
       </section>
 
@@ -253,87 +318,22 @@ function App() {
       </div>
 
       <section
-        className="showcase"
-        id="muestra"
-        aria-labelledby="muestra-title"
+        className="section labor"
+        id="labor"
+        aria-labelledby="labor-title"
       >
-        <h2 id="muestra-title">La muestra</h2>
-        <div className="showcase__stacks" role="list">
-          {showcaseItems.map((item) => (
-            <div
-              className="split split--stack showcase-stack"
-              key={item.title}
-              role="listitem"
-            >
-              <div className="split__img">
-                <img
-                  src={item.img}
-                  alt=""
-                  width={600}
-                  height={600}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="split__text">
-                <span className="split__kicker">{item.tag}</span>
-                <h3>{item.title}</h3>
-                <p>{item.note}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="showcase__contact" id="contacto">
-          <p>Hacemos encuentros, residencias breves y talleres por nodo</p>
+        <h2 id="labor-title" className="labor__title">
+          Labor
+        </h2>
+        <div className="split split--stack labor__inner">
+          <LaborImageRow />
+          <div className="split__text">
+            <span className="split__kicker">Aquí: etiqueta</span>
+            <h2>Aquí: título</h2>
+            <p>Aquí va el texto.</p>
+          </div>
         </div>
       </section>
-
-      <div className="bento" aria-label="Ejes de trabajo">
-        <div className="bento__grid">
-          <div className="bento__cell bento__cell--img">
-            <img
-              className="bento__image"
-              src={IMAGES.revelado}
-              alt=""
-              width={400}
-              height={400}
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div className="bento__cell">
-            <p className="bento__label">Modelado</p>
-          </div>
-          <div className="bento__cell bento__cell--img">
-            <img
-              className="bento__image"
-              src={IMAGES.podcast}
-              alt=""
-              width={400}
-              height={400}
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div className="bento__cell">
-            <p className="bento__label">Esmalte &amp; prueba</p>
-          </div>
-          <div className="bento__cell bento__cell--img">
-            <img
-              className="bento__image"
-              src={IMAGES.reveladoCopia}
-              alt=""
-              width={400}
-              height={400}
-              loading="lazy"
-              decoding="async"
-            />
-          </div>
-          <div className="bento__cell">
-            <p className="bento__label">Comunidad</p>
-          </div>
-        </div>
-      </div>
 
       <footer className="footer">
         <h2>Join us</h2>
