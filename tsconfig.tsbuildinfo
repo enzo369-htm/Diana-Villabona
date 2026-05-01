@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/images.ts","./src/main.tsx","./src/vite-env.d.ts"],"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/images.ts","./src/main.tsx","./src/siteconfig.ts","./src/vite-env.d.ts","./src/data/seed.ts","./src/data/selectors.ts","./src/layout/sitelayout.tsx","./src/pages/adminpage.tsx","./src/pages/bitacorapage.tsx","./src/pages/bitacorapostpage.tsx","./src/pages/homepage.tsx","./src/pages/piezadetailpage.tsx","./src/pages/piezaspage.tsx","./src/pages/sobremipage.tsx","./src/pages/tallerespage.tsx","./src/types/content.ts"],"version":"5.6.3"}
