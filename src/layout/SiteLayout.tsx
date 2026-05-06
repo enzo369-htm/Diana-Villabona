@@ -92,17 +92,6 @@ export function SiteLayout() {
           © {new Date().getFullYear()} Diana Villabona · Cerámica y procesos
         </p>
       </footer>
-
-      <a
-        className="whatsapp-float"
-        href={whatsappLink("Hola Diana, me gustaría contactarte.")}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Abrir WhatsApp"
-        title="WhatsApp"
-      >
-        <span aria-hidden>WA</span>
-      </a>
     </div>
   );
 }
