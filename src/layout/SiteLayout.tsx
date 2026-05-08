@@ -84,9 +84,6 @@ export function SiteLayout() {
           >
             Instagram
           </a>
-          <NavLink to="/admin" className="footer__admin">
-            Administración
-          </NavLink>
         </div>
         <p className="credit">
           © {new Date().getFullYear()} Diana Villabona · Cerámica y procesos

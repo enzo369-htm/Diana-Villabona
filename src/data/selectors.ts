@@ -1,22 +1,25 @@
-import { homeConfig, piezas, posts } from "./seed";
+import { homeConfig } from "./seed";
 import type { Pieza, Post } from "../types/content";
 
-export function getPiezaById(id: string): Pieza | undefined {
+export function getPiezaById(piezas: Pieza[], id: string): Pieza | undefined {
   return piezas.find((p) => p.id === id);
 }
 
-export function getPostById(id: string): Post | undefined {
+export function getPostById(posts: Post[], id: string): Post | undefined {
   return posts.find((p) => p.id === id);
 }
 
-export function getPiezasHome(): Pieza[] {
+export function getPiezasHome(piezas: Pieza[]): Pieza[] {
   return homeConfig.idsPiezasHome
-    .map((id) => getPiezaById(id))
+    .map((id) => getPiezaById(piezas, id))
     .filter((p): p is Pieza => Boolean(p));
 }
 
-export function getPostDestacado(): Post | undefined {
-  return getPostById(homeConfig.idPostDestacado) ?? posts[0];
+export function getPostDestacado(posts: Post[]): Post | undefined {
+  return (
+    getPostById(posts, homeConfig.idPostDestacado) ??
+    posts[0]
+  );
 }
 
 export const tecnicasDisponibles = [
@@ -39,7 +42,7 @@ export function filtrarPiezas(
   return lista.filter((p) => p.tecnica === filtro);
 }
 
-export function postsOrdenados(): Post[] {
+export function postsOrdenados(posts: Post[]): Post[] {
   return [...posts].sort((a, b) => {
     const ta = a.fecha ? new Date(a.fecha).getTime() : 0;
     const tb = b.fecha ? new Date(b.fecha).getTime() : 0;

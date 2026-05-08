@@ -22,7 +22,8 @@ export interface Pieza {
 export interface Post {
   id: string;
   titulo: string;
-  cuerpoHtml: string;
+  /** Texto plano del cuerpo (el sitio lo convierte a HTML al mostrarlo). */
+  cuerpo: string;
   portada: string;
   fecha: string;
   videoUrl?: string;

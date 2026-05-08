@@ -78,7 +78,7 @@ export const posts: Post[] = [
     portada: IMAGES.muestraTallerHornera,
     fecha: "",
     destacado: true,
-    cuerpoHtml: "<p>Cuerpo de la entrada.</p>",
+    cuerpo: "Cuerpo de la entrada.",
   },
   {
     id: "post-2",
@@ -86,7 +86,7 @@ export const posts: Post[] = [
     extracto: "Extracto.",
     portada: IMAGES.muestraFormulacionEsmaltes,
     fecha: "",
-    cuerpoHtml: "<p>Cuerpo de la entrada.</p>",
+    cuerpo: "Cuerpo de la entrada.",
   },
 ];
 

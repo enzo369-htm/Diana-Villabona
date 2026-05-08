@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { postsOrdenados } from "../data/selectors";
+import { useContent } from "../context/ContentContext";
 
 export function BitacoraPage() {
-  const items = postsOrdenados();
+  const { posts } = useContent();
+  const items = postsOrdenados(posts);
 
   return (
     <div className="page-content page-content--pad">

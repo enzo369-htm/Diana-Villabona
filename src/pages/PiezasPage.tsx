@@ -1,17 +1,18 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { piezas } from "../data/seed";
 import {
   filtrarPiezas,
   tecnicasDisponibles,
   type FiltroTecnica,
 } from "../data/selectors";
+import { useContent } from "../context/ContentContext";
 
 export function PiezasPage() {
+  const { piezas } = useContent();
   const [filtro, setFiltro] = useState<FiltroTecnica>("Todas");
   const lista = useMemo(
     () => filtrarPiezas(piezas, filtro),
-    [filtro]
+    [piezas, filtro]
   );
 
   return (

@@ -7,7 +7,7 @@ import { BitacoraPage } from "./pages/BitacoraPage";
 import { BitacoraPostPage } from "./pages/BitacoraPostPage";
 import { TalleresPage } from "./pages/TalleresPage";
 import { SobreMiPage } from "./pages/SobreMiPage";
-import { AdminPage } from "./pages/AdminPage";
+import { AdminGate } from "./admin/AdminGate";
 
 export default function App() {
   return (
@@ -21,7 +21,7 @@ export default function App() {
           <Route path="bitacora/:id" element={<BitacoraPostPage />} />
           <Route path="talleres" element={<TalleresPage />} />
           <Route path="sobre-mi" element={<SobreMiPage />} />
-          <Route path="admin" element={<AdminPage />} />
+          <Route path="admin" element={<AdminGate />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>

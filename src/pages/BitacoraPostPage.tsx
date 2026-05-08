@@ -1,9 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { getPostById } from "../data/selectors";
+import { useContent } from "../context/ContentContext";
+import { plainTextToSafeHtml } from "../utils/plainText";
 
 export function BitacoraPostPage() {
+  const { posts } = useContent();
   const { id } = useParams<{ id: string }>();
-  const post = id ? getPostById(id) : undefined;
+  const post = id ? getPostById(posts, id) : undefined;
 
   if (!post) {
     return (
@@ -44,7 +47,9 @@ export function BitacoraPostPage() {
 
       <div
         className="editorial__body"
-        dangerouslySetInnerHTML={{ __html: post.cuerpoHtml }}
+        dangerouslySetInnerHTML={{
+          __html: plainTextToSafeHtml(post.cuerpo),
+        }}
       />
     </article>
   );

@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { whatsappLink } from "../siteConfig";
 import { getPiezaById } from "../data/selectors";
+import { useContent } from "../context/ContentContext";
 
 export function PiezaDetailPage() {
+  const { piezas } = useContent();
   const { id } = useParams<{ id: string }>();
-  const pieza = id ? getPiezaById(id) : undefined;
+  const pieza = id ? getPiezaById(piezas, id) : undefined;
   const [zoomed, setZoomed] = useState<string | null>(null);
   const [active, setActive] = useState(0);
 
