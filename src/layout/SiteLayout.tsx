@@ -57,38 +57,40 @@ export function SiteLayout() {
         <Outlet />
       </main>
 
-      <footer className="footer">
-        <p className="footer__contact-line">
-          Consultas y disponibilidad:{" "}
-          <a
-            href={whatsappLink("Hola Diana, me gustaría consultarte por una pieza o un taller.")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            WhatsApp
-          </a>
-        </p>
-        <div className="footer-links">
-          <NavLink to="/" end>
-            Inicio
-          </NavLink>
-          <NavLink to="/piezas">Piezas</NavLink>
-          <NavLink to="/bitacora">Bitácora</NavLink>
-          <NavLink to="/talleres">Talleres</NavLink>
-          <NavLink to="/sobre-mi">Sobre mí</NavLink>
-          <a
-            href={INSTAGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            Instagram
-          </a>
-        </div>
-        <p className="credit">
-          © {new Date().getFullYear()} Diana Villabona · Cerámica y procesos
-        </p>
-      </footer>
+      {!isHome ? (
+        <footer className="footer">
+          <p className="footer__contact-line">
+            Consultas y disponibilidad:{" "}
+            <a
+              href={whatsappLink("Hola Diana, me gustaría consultarte por una pieza o un taller.")}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              WhatsApp
+            </a>
+          </p>
+          <div className="footer-links">
+            <NavLink to="/" end>
+              Inicio
+            </NavLink>
+            <NavLink to="/piezas">Piezas</NavLink>
+            <NavLink to="/bitacora">Bitácora</NavLink>
+            <NavLink to="/talleres">Talleres</NavLink>
+            <NavLink to="/sobre-mi">Sobre mí</NavLink>
+            <a
+              href={INSTAGRAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              Instagram
+            </a>
+          </div>
+          <p className="credit">
+            © {new Date().getFullYear()} Diana Villabona · Cerámica y procesos
+          </p>
+        </footer>
+      ) : null}
     </div>
   );
 }
