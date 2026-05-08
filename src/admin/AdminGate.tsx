@@ -1,8 +1,49 @@
 import { type FormEvent, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { AdminPage } from "../pages/AdminPage";
 
 const SESSION_KEY = "dvc-admin-session";
+
+function AdminPassphraseMissing() {
+  return (
+    <div className="page-content page-content--pad admin-hub">
+      <header className="page-header">
+        <h1>Administración</h1>
+        <p className="page-header__lede">
+          En producción hace falta definir la contraseña del panel en el hosting.
+          Vite solo la incluye si existe al <strong>construir</strong> el sitio.
+        </p>
+      </header>
+      <div className="admin-deploy-help">
+        <p>
+          En <strong>Vercel</strong>: proyecto → <strong>Settings</strong> →{" "}
+          <strong>Environment Variables</strong> → añade:
+        </p>
+        <ul>
+          <li>
+            Nombre: <code>VITE_ADMIN_PASSPHRASE</code>
+          </li>
+          <li>
+            Valor: tu contraseña (la misma que en <code>.env.local</code>)
+          </li>
+          <li>
+            Entorno: al menos <strong>Production</strong> (y Preview si quieres la
+            misma en previews)
+          </li>
+        </ul>
+        <p>
+          Luego <strong>Redeploy</strong> el último despliegue (Deployments → ⋮ →
+          Redeploy). Sin un nuevo build, la variable no entra en el JavaScript.
+        </p>
+      </div>
+      <p style={{ marginTop: "1.25rem" }}>
+        <Link className="btn-pill btn-pill--ghost" to="/">
+          Volver al sitio
+        </Link>
+      </p>
+    </div>
+  );
+}
 
 function sessionIsUnlocked(): boolean {
   return sessionStorage.getItem(SESSION_KEY) === "1";
@@ -74,12 +115,16 @@ export function AdminGate() {
   }
 
   const phrase = import.meta.env.VITE_ADMIN_PASSPHRASE?.trim() ?? "";
+  const isProd = import.meta.env.PROD;
 
   const [unlocked, setUnlocked] = useState(() =>
     phrase ? sessionIsUnlocked() : true
   );
 
   if (!phrase) {
+    if (isProd) {
+      return <AdminPassphraseMissing />;
+    }
     return <AdminPage />;
   }
 
