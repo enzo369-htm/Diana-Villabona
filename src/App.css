@@ -18,6 +18,8 @@
   --track: 0.35em;
   --r-pill: 999px;
   --shadow: 0 12px 40px rgba(20, 18, 16, 0.08);
+  /* Ancho mínimo del sitio (~pantalla 12" en horizontal / portátil pequeño). */
+  --site-min-viewport-width: 1280px;
   /* /public: nombre con espacios codificados en la URL */
   --page-fondo-pieles: url("/Pieles%20de%20quemas%20experimentales..jpg");
 }
@@ -99,6 +101,56 @@ a:hover {
   min-height: 100vh;
   position: relative;
   z-index: 1;
+}
+
+/* —— Bloqueo por viewport estrecho (alineado a --site-min-viewport-width) —— */
+.viewport-min-gate {
+  display: none;
+}
+
+@media (max-width: 1279px) {
+  .viewport-min-gate {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    padding: clamp(1.25rem, 5vw, 2.5rem);
+    text-align: center;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+  }
+
+  .viewport-min-gate__title {
+    font-family: var(--serif);
+    font-size: clamp(1.35rem, 4.5vw, 1.85rem);
+    font-weight: 500;
+    margin: 0;
+    line-height: 1.25;
+    max-width: 22rem;
+  }
+
+  .viewport-min-gate__text {
+    margin: 0;
+    max-width: 28rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+}
+
+html.viewport-too-narrow,
+html.viewport-too-narrow body {
+  overflow: hidden;
+  height: 100%;
+}
+
+html.viewport-too-narrow body {
+  touch-action: none;
 }
 
 /* —— Top: flota sobre el hero, sin cinta ni fondo —— */
