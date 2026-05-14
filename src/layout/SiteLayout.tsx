@@ -135,18 +135,6 @@ export function SiteLayout() {
             </p>
           </footer>
         ) : null}
-
-        <aside
-          className="site-sample-banner"
-          aria-label="Aviso: sitio de muestra"
-        >
-          <p>
-            <strong>Sitio de muestra.</strong> Diseño visual completamente original,
-            desarrollado para este proyecto. Contenidos, textos, imágenes y estructura
-            son editables por completo. Construido con código a medida — sin plantillas
-            genéricas ni constructores cerrados.
-          </p>
-        </aside>
       </div>
     </div>
   );
