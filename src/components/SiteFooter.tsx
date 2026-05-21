@@ -1,5 +1,7 @@
 import { NavLink } from "react-router-dom";
-import { CONTACT_EMAIL, INSTAGRAM_URL, SITE_NAME } from "../siteConfig";
+import { CONTACT_EMAIL, INSTAGRAM_URL } from "../siteConfig";
+
+const FOOTER_NAME = "Diana Villabona";
 
 const sections: { to: string; label: string; end?: boolean }[] = [
   { to: "/", label: "Inicio", end: true },
@@ -8,6 +10,15 @@ const sections: { to: string; label: string; end?: boolean }[] = [
   { to: "/talleres", label: "Talleres" },
   { to: "/sobre-mi", label: "Sobre mí" },
 ];
+
+function MailIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 6.5h16v11H4z" />
+      <path d="m4 7.5 8 5.5 8-5.5" />
+    </svg>
+  );
+}
 
 function InstagramIcon() {
   return (
@@ -41,7 +52,7 @@ export function SiteFooter() {
         <div className="site-footer__inner">
           <header className="site-footer__head">
             <p className="site-footer__eyebrow">Piezas, procesos y talleres</p>
-            <h2 className="site-footer__title">{SITE_NAME}</h2>
+            <h2 className="site-footer__title">{FOOTER_NAME}</h2>
           </header>
 
           <div className="site-footer__body">
@@ -59,46 +70,44 @@ export function SiteFooter() {
               </ul>
             </nav>
 
-            <div className="site-footer__aside">
-              <div className="site-footer__reach">
-                <p className="site-footer__label">Email</p>
+            <div className="site-footer__actions">
+              <div className="site-footer__actions-row">
                 <a
-                  className="site-footer__email"
+                  className="site-footer__action-btn site-footer__action-btn--mail"
                   href={`mailto:${CONTACT_EMAIL}`}
+                  aria-label={`Email — ${CONTACT_EMAIL}`}
                 >
-                  {CONTACT_EMAIL}
+                  <MailIcon />
                 </a>
+                <a
+                  className="site-footer__action-btn site-footer__action-btn--ig"
+                  href={INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon />
+                </a>
+                <NavLink
+                  className="site-footer__action-btn site-footer__action-btn--cta"
+                  to="/contacto"
+                >
+                  Ventana de contacto
+                </NavLink>
               </div>
 
-              <div className="site-footer__social">
-                <p className="site-footer__label">Redes</p>
-                <div className="site-footer__social-actions">
-                  <a
-                    className="site-footer__ig-btn"
-                    href={INSTAGRAM_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Instagram"
-                  >
-                    <InstagramIcon />
-                  </a>
-                  <button
-                    type="button"
-                    className="site-footer__top-btn"
-                    onClick={scrollToTop}
-                    aria-label="Volver arriba"
-                  >
-                    <ArrowUpIcon />
-                    <span className="site-footer__top-text">Arriba</span>
-                  </button>
-                </div>
+              <div className="site-footer__top-row">
+                <button
+                  type="button"
+                  className="site-footer__action-btn site-footer__action-btn--top"
+                  onClick={scrollToTop}
+                  aria-label="Volver arriba"
+                >
+                  <ArrowUpIcon />
+                </button>
               </div>
             </div>
           </div>
-
-          <NavLink className="site-footer__cta" to="/contacto">
-            Ventana de contacto
-          </NavLink>
 
           <p className="site-footer__credit">
             © {year} Diana Villabona · Cerámica y procesos
