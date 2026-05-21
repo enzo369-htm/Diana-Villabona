@@ -1,5 +1,5 @@
 import { IMAGES } from "../images";
-import { HomeVitrina } from "./HomeVitrina";
+import { HomePortfolioPreview } from "./HomePortfolioPreview";
 
 /**
  * Mosaico de 5 fotos: grid 2×2 + columna derecha a todo alto.
@@ -52,7 +52,7 @@ export function HomePage() {
           <HeroMosaic />
         </div>
       </section>
-      <HomeVitrina />
+      <HomePortfolioPreview />
     </>
   );
 }
