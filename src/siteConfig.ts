@@ -3,6 +3,9 @@ export const WHATSAPP_PHONE = "573001234567";
 
 export const SITE_NAME = "Diana Villabona Cerámica";
 
+/** Sustituir por el correo real de contacto. */
+export const CONTACT_EMAIL = "hola@dianavillabona.com";
+
 export const INSTAGRAM_URL = "https://www.instagram.com/";
 
 export function whatsappLink(prefill: string): string {

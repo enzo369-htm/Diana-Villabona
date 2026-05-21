@@ -1,4 +1,5 @@
 import { IMAGES } from "../images";
+import { HomeVitrina } from "./HomeVitrina";
 
 /**
  * Mosaico de 5 fotos: grid 2×2 + columna derecha a todo alto.
@@ -45,10 +46,13 @@ function HeroMosaic() {
 
 export function HomePage() {
   return (
-    <section className="hero" id="inicio" aria-label="Bienvenida">
-      <div className="hero__image-wrap" aria-hidden>
-        <HeroMosaic />
-      </div>
-    </section>
+    <>
+      <section className="hero" id="inicio" aria-label="Bienvenida">
+        <div className="hero__image-wrap" aria-hidden>
+          <HeroMosaic />
+        </div>
+      </section>
+      <HomeVitrina />
+    </>
   );
 }

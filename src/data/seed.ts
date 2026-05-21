@@ -10,7 +10,7 @@ export const homeConfig: HomeConfig = {
     IMAGES.hero,
   ],
   idPostDestacado: "post-1",
-  idsPiezasHome: ["p1", "p2", "p3", "p4", "p5"],
+  idsPiezasHome: ["p1", "p2", "p3", "p4"],
 };
 
 export const piezas: Pieza[] = [
