@@ -270,7 +270,7 @@ html.viewport-too-narrow body {
   object-fit: cover;
   object-position: center;
   display: block;
-  animation: hero-split-fade-in 0.55s ease-out;
+  animation: hero-split-fade-in 0.38s ease-out;
 }
 
 @keyframes hero-split-fade-in {

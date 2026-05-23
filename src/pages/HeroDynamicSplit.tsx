@@ -4,7 +4,8 @@ import {
   heroSplitQueues,
 } from "../data/verticalHeroImages";
 
-const INTERVAL_MS = 2000;
+/** Tiempo entre cambios de imagen (izq. y der. a la vez). */
+const INTERVAL_MS = 1000;
 
 function HeroPane({
   src,
@@ -37,7 +38,7 @@ function HeroPane({
 }
 
 /**
- * Hero pantalla completa: dos columnas 50/50. Cada 2 s cambian ambas fotos a la vez
+ * Hero pantalla completa: dos columnas 50/50. A intervalos regulares cambian ambas fotos a la vez
  * (izquierda y derecha siguen cada una su cola verticales impar/pair).
  */
 export function HeroDynamicSplit() {
