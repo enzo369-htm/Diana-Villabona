@@ -1,5 +1,6 @@
 import { HeroDynamicSplit } from "./HeroDynamicSplit";
 import { HomePortfolioPreview } from "./HomePortfolioPreview";
+import { HomeVitrina } from "./HomeVitrina";
 
 export function HomePage() {
   return (
@@ -10,6 +11,7 @@ export function HomePage() {
         </div>
       </section>
       <HomePortfolioPreview />
+      <HomeVitrina />
     </>
   );
 }

@@ -10,7 +10,27 @@ export function HomeVitrina() {
     [piezas]
   );
 
-  if (destacadas.length === 0) return null;
+  if (destacadas.length === 0) {
+    return (
+      <section
+        className="home-vitrina"
+        id="tienda"
+        aria-labelledby="home-vitrina-title"
+      >
+        <div className="home-vitrina__inner">
+          <h2 id="home-vitrina-title">Piezas destacadas · tienda</h2>
+          <p className="home-vitrina__lede">
+            Abrí el catálogo para ver todas las piezas disponibles.
+          </p>
+          <div className="home-vitrina__actions">
+            <Link to="/piezas" className="btn-pill btn-pill--ghost">
+              Ver catálogo
+            </Link>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
