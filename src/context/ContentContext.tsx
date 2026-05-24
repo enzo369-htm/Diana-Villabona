@@ -4,13 +4,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
 import type { Pieza, Post } from "../types/content";
 import { piezas as seedPiezas, posts as seedPosts } from "../data/seed";
-import { clearCms, loadCms, saveCms } from "../data/contentStore";
+import { clearCms, loadCms, mergePiezasWithSeed, mergePostsWithSeed, saveCms } from "../data/contentStore";
 
 export type ContentContextValue = {
   piezas: Pieza[];
@@ -33,19 +32,14 @@ function cloneSeedPosts(): Post[] {
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [piezas, setPiezas] = useState<Pieza[]>(() => {
     const s = loadCms();
-    return s?.piezas ?? cloneSeedPiezas();
+    return mergePiezasWithSeed(s?.piezas ?? null, cloneSeedPiezas());
   });
   const [posts, setPosts] = useState<Post[]>(() => {
     const s = loadCms();
-    return s?.posts ?? cloneSeedPosts();
+    return mergePostsWithSeed(s?.posts ?? null, cloneSeedPosts());
   });
-  const skipNextSave = useRef(true);
 
   useEffect(() => {
-    if (skipNextSave.current) {
-      skipNextSave.current = false;
-      return;
-    }
     saveCms({ piezas, posts });
   }, [piezas, posts]);
 

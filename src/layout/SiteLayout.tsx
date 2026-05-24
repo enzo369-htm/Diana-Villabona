@@ -7,16 +7,16 @@ import { SITE_NAME } from "../siteConfig";
 const SITE_MIN_VIEWPORT_PX = 1280;
 
 const nav: { to: string; label: string; end?: boolean }[] = [
-  { to: "/", label: "Inicio", end: true },
-  { to: "/piezas", label: "Piezas" },
-  { to: "/bitacora", label: "Bitácora" },
+  { to: "/portfolio", label: "Portfolio" },
+  { to: "/piezas", label: "Tienda" },
+  { to: "/bitacora", label: "Blog" },
   { to: "/talleres", label: "Talleres" },
   { to: "/sobre-mi", label: "Sobre mí" },
 ];
 
 export function SiteLayout() {
   const { pathname, hash } = useLocation();
-  const isHome = pathname === "/";
+  const isOverlayHeader = pathname === "/" || pathname === "/portfolio";
   const [narrow, setNarrow] = useState(() =>
     typeof window !== "undefined"
       ? window.matchMedia(`(max-width: ${SITE_MIN_VIEWPORT_PX - 1}px)`).matches
@@ -71,7 +71,7 @@ export function SiteLayout() {
       >
         <header
           className={
-            isHome ? "site-top" : "site-top site-top--solid"
+            isOverlayHeader ? "site-top" : "site-top site-top--solid"
           }
         >
           <div className="site-top__ig">

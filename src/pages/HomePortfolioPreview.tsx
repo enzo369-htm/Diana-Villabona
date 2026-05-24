@@ -12,7 +12,7 @@ export function HomePortfolioPreview() {
 
   return (
     <section
-      className="home-portfolio"
+      className="home-band home-portfolio"
       id="coleccion"
       aria-labelledby="home-portfolio-title"
     >

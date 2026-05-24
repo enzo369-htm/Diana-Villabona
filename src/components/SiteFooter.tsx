@@ -1,12 +1,10 @@
 import { NavLink } from "react-router-dom";
 import { CONTACT_EMAIL, INSTAGRAM_URL } from "../siteConfig";
 
-const FOOTER_NAME = "Diana Villabona";
-
 const sections: { to: string; label: string; end?: boolean }[] = [
-  { to: "/", label: "Inicio", end: true },
-  { to: "/piezas", label: "Piezas" },
-  { to: "/bitacora", label: "Bitácora" },
+  { to: "/portfolio", label: "Portfolio" },
+  { to: "/piezas", label: "Tienda" },
+  { to: "/bitacora", label: "Blog" },
   { to: "/talleres", label: "Talleres" },
   { to: "/sobre-mi", label: "Sobre mí" },
 ];
@@ -50,11 +48,6 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div className="site-footer__surface">
         <div className="site-footer__inner">
-          <header className="site-footer__head">
-            <p className="site-footer__eyebrow">Piezas, procesos y talleres</p>
-            <h2 className="site-footer__title">{FOOTER_NAME}</h2>
-          </header>
-
           <div className="site-footer__body">
             <nav className="site-footer__nav" aria-label="Secciones del sitio">
               <p className="site-footer__label">Secciones</p>

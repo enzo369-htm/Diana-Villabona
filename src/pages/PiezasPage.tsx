@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   filtrarPiezas,
   tecnicasDisponibles,
   type FiltroTecnica,
 } from "../data/selectors";
+import { VitrinaCard } from "../components/VitrinaCard";
 import { useContent } from "../context/ContentContext";
 
 export function PiezasPage() {
@@ -16,13 +16,13 @@ export function PiezasPage() {
   );
 
   return (
-    <div className="page-content page-content--pad">
-      <header className="page-header">
-        <h1>Piezas</h1>
-        <p className="page-header__lede">
-          Exhibición y venta consultiva. Filtra por técnica y abre la ficha para
-          ver galería, medidas e historia. La disponibilidad se confirma por
-          WhatsApp.
+    <section
+      className="home-band piezas-catalog"
+      aria-labelledby="piezas-catalog-title"
+    >
+      <header className="home-vitrina__head piezas-catalog__head">
+        <p id="piezas-catalog-title" className="home-band__eyebrow">
+          Tienda
         </p>
       </header>
 
@@ -41,31 +41,17 @@ export function PiezasPage() {
         ))}
       </div>
 
-      <ul className="piezas-grid" role="list">
-        {lista.map((p) => (
-          <li key={p.id}>
-            <Link to={`/piezas/${p.id}`} className="piezas-card">
-              <div className="piezas-card__img">
-                <img
-                  src={p.imagenes[0]}
-                  alt=""
-                  width={640}
-                  height={640}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <div className="piezas-card__meta">
-                <span className="piezas-card__tag">{p.tecnica}</span>
-                <h2>{p.titulo}</h2>
-                <p className="piezas-card__status">
-                  {p.disponible ? "Disponible" : "Vendida"}
-                </p>
-              </div>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+      {lista.length === 0 ? (
+        <p className="piezas-catalog__empty">
+          No hay piezas con esa técnica. Probá otro filtro.
+        </p>
+      ) : (
+        <div className="home-vitrina__grid piezas-catalog__grid" role="list">
+          {lista.map((p, index) => (
+            <VitrinaCard key={p.id} pieza={p} index={index} />
+          ))}
+        </div>
+      )}
+    </section>
   );
 }

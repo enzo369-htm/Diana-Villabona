@@ -58,16 +58,6 @@ export const piezas: Pieza[] = [
     destacadaHome: true,
     disponible: true,
   },
-  {
-    id: "p5",
-    titulo: "Raíz y fique",
-    descripcion: "Textura vegetal impresa en la piel cerámica antes del fuego.",
-    dimensiones: "22 × 15 cm",
-    tecnica: "Modelado",
-    imagenes: [IMAGES.muestraFiqueRaiz],
-    destacadaHome: true,
-    disponible: true,
-  },
 ];
 
 export const posts: Post[] = [

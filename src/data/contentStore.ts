@@ -75,3 +75,23 @@ export function saveCms(data: StoredCms): void {
 export function clearCms(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
+
+/** El seed define qué piezas existen; el CMS solo puede editar las que siguen en seed. */
+export function mergePiezasWithSeed(stored: Pieza[] | null, seed: Pieza[]): Pieza[] {
+  if (!stored) return seed;
+  const storedById = new Map(stored.map((p) => [p.id, p]));
+  return seed.map((s) => {
+    const override = storedById.get(s.id);
+    return override ? { ...s, ...override, id: s.id } : s;
+  });
+}
+
+/** El seed define qué entradas existen; el CMS solo puede editar las que siguen en seed. */
+export function mergePostsWithSeed(stored: Post[] | null, seed: Post[]): Post[] {
+  if (!stored) return seed;
+  const storedById = new Map(stored.map((p) => [p.id, p]));
+  return seed.map((s) => {
+    const override = storedById.get(s.id);
+    return override ? normalizeStoredPost({ ...s, ...override, id: s.id }) : s;
+  });
+}

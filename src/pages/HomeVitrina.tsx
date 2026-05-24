@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { VitrinaCard } from "../components/VitrinaCard";
 import { useContent } from "../context/ContentContext";
 import { getPiezasHome } from "../data/selectors";
 
@@ -13,20 +14,19 @@ export function HomeVitrina() {
   if (destacadas.length === 0) {
     return (
       <section
-        className="home-vitrina"
+        className="home-band home-vitrina"
         id="tienda"
         aria-labelledby="home-vitrina-title"
       >
-        <div className="home-vitrina__inner">
-          <h2 id="home-vitrina-title">Piezas destacadas · tienda</h2>
-          <p className="home-vitrina__lede">
-            Abrí el catálogo para ver todas las piezas disponibles.
+        <header className="home-vitrina__head">
+          <p id="home-vitrina-title" className="home-band__eyebrow">
+            Tienda
           </p>
-          <div className="home-vitrina__actions">
-            <Link to="/piezas" className="btn-pill btn-pill--ghost">
-              Ver catálogo
-            </Link>
-          </div>
+        </header>
+        <div className="home-vitrina__actions">
+          <Link to="/piezas" className="btn-pill btn-pill--ghost">
+            Ver catálogo
+          </Link>
         </div>
       </section>
     );
@@ -34,46 +34,26 @@ export function HomeVitrina() {
 
   return (
     <section
-      className="home-vitrina"
+      className="home-band home-vitrina"
       id="tienda"
       aria-labelledby="home-vitrina-title"
     >
-      <div className="home-vitrina__inner">
-        <h2 id="home-vitrina-title">Piezas destacadas</h2>
-        <p className="home-vitrina__lede">
-          Una selección del taller. Abrí la ficha para ver detalle y consultar
-          disponibilidad.
+      <header className="home-vitrina__head">
+        <p id="home-vitrina-title" className="home-band__eyebrow">
+          Tienda
         </p>
+      </header>
 
-        <div className="home-vitrina__grid">
-          {destacadas.map((p) => (
-            <Link
-              key={p.id}
-              to={`/piezas/${p.id}`}
-              className="home-vitrina__card"
-            >
-              <div className="home-vitrina__img">
-                <img
-                  src={p.imagenes[0]}
-                  alt=""
-                  width={640}
-                  height={640}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              <span className="home-vitrina__tag">{p.tecnica}</span>
-              <h3>{p.titulo}</h3>
-              <span className="home-vitrina__cta">Ver ficha</span>
-            </Link>
-          ))}
-        </div>
+      <div className="home-vitrina__grid">
+        {destacadas.map((p, index) => (
+          <VitrinaCard key={p.id} pieza={p} index={index} />
+        ))}
+      </div>
 
-        <div className="home-vitrina__actions">
-          <Link to="/piezas" className="btn-pill btn-pill--ghost">
-            Ver catálogo
-          </Link>
-        </div>
+      <div className="home-vitrina__actions">
+        <Link to="/piezas" className="btn-pill btn-pill--ghost">
+          Ver catálogo completo
+        </Link>
       </div>
     </section>
   );
