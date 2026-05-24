@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { SiteFooter } from "../components/SiteFooter";
 import { SITE_NAME } from "../siteConfig";
 
@@ -23,12 +23,15 @@ export function SiteLayout() {
       : false
   );
 
-  useEffect(() => {
-    if (!hash) return;
-    const id = hash.replace(/^#/, "");
-    window.requestAnimationFrame(() => {
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-    });
+  useLayoutEffect(() => {
+    if (hash) {
+      const id = hash.replace(/^#/, "");
+      requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      });
+      return;
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname, hash]);
 
   useEffect(() => {
