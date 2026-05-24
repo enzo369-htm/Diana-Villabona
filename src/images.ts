@@ -26,6 +26,8 @@ export const IMAGES = {
   muestraSaggarHuella: "/muestra-saggar-huella.jpg",
   muestraTallerHornera: "/muestra-taller-hornera.jpg",
   muestraFormulacionEsmaltes: "/muestra-formulacion-esmaltes.jpg",
+  imgblog1: "/imgblog1.jpg",
+  imgblog2: "/imgblog2.jpeg",
 } as const;
 
 /** Rutas de fotos en /public para elegir 3 al azar (p. ej. sección Labor). */

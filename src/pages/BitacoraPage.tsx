@@ -8,8 +8,8 @@ export function BitacoraPage() {
 
   return (
     <div className="page-content page-content--pad">
-      <header className="page-header">
-        <h1>Blog</h1>
+      <header className="page-header page-header--blog">
+        <h1 className="home-portfolio__title">Blog</h1>
       </header>
 
       <ul className="bita-feed" role="list">
