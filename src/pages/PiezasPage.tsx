@@ -21,7 +21,7 @@ export function PiezasPage() {
       aria-labelledby="piezas-catalog-title"
     >
       <header className="home-vitrina__head piezas-catalog__head">
-        <p id="piezas-catalog-title" className="home-band__eyebrow">
+        <p id="piezas-catalog-title" className="section-title home-band__eyebrow">
           Tienda
         </p>
       </header>

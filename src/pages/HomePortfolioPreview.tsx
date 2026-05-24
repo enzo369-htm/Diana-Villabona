@@ -16,7 +16,7 @@ export function HomePortfolioPreview() {
       id="coleccion"
       aria-labelledby="home-portfolio-title"
     >
-      <h2 id="home-portfolio-title" className="home-portfolio__title">
+      <h2 id="home-portfolio-title" className="section-title home-portfolio__title">
         Colección cerámica
       </h2>
       <div className="home-portfolio__grid" role="list">

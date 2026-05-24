@@ -7,12 +7,12 @@ export function BitacoraPage() {
   const items = postsOrdenados(posts);
 
   return (
-    <div className="page-content page-content--pad">
+    <div className="page-content page-content--pad page-content--bitacora">
       <header className="page-header page-header--blog">
-        <h1 className="home-portfolio__title">Blog</h1>
+        <h1 className="section-title">Blog</h1>
       </header>
 
-      <ul className="bita-feed" role="list">
+      <ul className="bita-feed bita-feed--aligned" role="list">
         {items.map((post) => (
           <li key={post.id}>
             <article className="bita-feed__item">

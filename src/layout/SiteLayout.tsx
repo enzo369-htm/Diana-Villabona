@@ -126,33 +126,31 @@ export function SiteLayout() {
             .join(" ")}
         >
           <div className="site-top__bar">
-            <div className="site-top__inner">
-              <NavLink
-                className="site-top__brand"
-                to="/"
-                end
-                aria-label={`Inicio — ${SITE_NAME}`}
-              >
-                <span className="site-top__brand-text">{SITE_NAME}</span>
-              </NavLink>
-              <nav className="site-nav" aria-label="Principal">
-                <ul className="site-nav__list">
-                  {nav.map(({ to, label, end }) => (
-                    <li key={to}>
-                      <NavLink
-                        to={to}
-                        end={Boolean(end)}
-                        className={({ isActive }) =>
-                          isActive ? "site-nav__link is-active" : "site-nav__link"
-                        }
-                      >
-                        {label}
-                      </NavLink>
-                    </li>
-                  ))}
-                </ul>
-              </nav>
-            </div>
+            <NavLink
+              className="site-top__brand"
+              to="/"
+              end
+              aria-label={`Inicio — ${SITE_NAME}`}
+            >
+              <span className="site-top__brand-text">{SITE_NAME}</span>
+            </NavLink>
+            <nav className="site-nav" aria-label="Principal">
+              <ul className="site-nav__list">
+                {nav.map(({ to, label, end }) => (
+                  <li key={to}>
+                    <NavLink
+                      to={to}
+                      end={Boolean(end)}
+                      className={({ isActive }) =>
+                        isActive ? "site-nav__link is-active" : "site-nav__link"
+                      }
+                    >
+                      {label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </header>
 

@@ -19,7 +19,7 @@ export function HomeVitrina() {
         aria-labelledby="home-vitrina-title"
       >
         <header className="home-vitrina__head">
-          <p id="home-vitrina-title" className="home-band__eyebrow">
+          <p id="home-vitrina-title" className="section-title home-band__eyebrow">
             Tienda
           </p>
         </header>
@@ -39,7 +39,7 @@ export function HomeVitrina() {
       aria-labelledby="home-vitrina-title"
     >
       <header className="home-vitrina__head">
-        <p id="home-vitrina-title" className="home-band__eyebrow">
+        <p id="home-vitrina-title" className="section-title home-band__eyebrow">
           Tienda
         </p>
       </header>
