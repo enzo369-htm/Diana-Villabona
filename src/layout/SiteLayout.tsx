@@ -1,10 +1,14 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SiteFooter } from "../components/SiteFooter";
 import { SITE_NAME } from "../siteConfig";
 
 /** Coincide con `--site-min-viewport-width` en App.css (aprox. 12" en horizontal). */
 const SITE_MIN_VIEWPORT_PX = 1280;
+const SCROLL_DELTA = 8;
+const SCROLL_MIN_TO_HIDE = 72;
+/** En home: solo arriba del todo el nav flota sobre el hero (sin barra). */
+const HERO_FLOAT_MAX = 40;
 
 const nav: { to: string; label: string; end?: boolean }[] = [
   { to: "/portfolio", label: "Portfolio" },
@@ -16,14 +20,23 @@ const nav: { to: string; label: string; end?: boolean }[] = [
 
 export function SiteLayout() {
   const { pathname, hash } = useLocation();
-  const isOverlayHeader = pathname === "/" || pathname === "/portfolio";
+  const isHome = pathname === "/";
   const [narrow, setNarrow] = useState(() =>
     typeof window !== "undefined"
       ? window.matchMedia(`(max-width: ${SITE_MIN_VIEWPORT_PX - 1}px)`).matches
       : false
   );
+  const [headerHidden, setHeaderHidden] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const lastScrollY = useRef(0);
+
+  const isHeroFloatNav =
+    isHome && !headerHidden && scrollY <= HERO_FLOAT_MAX;
 
   useLayoutEffect(() => {
+    setHeaderHidden(false);
+    setScrollY(0);
+    lastScrollY.current = 0;
     if (hash) {
       const id = hash.replace(/^#/, "");
       requestAnimationFrame(() => {
@@ -33,6 +46,37 @@ export function SiteLayout() {
     }
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [pathname, hash]);
+
+  useEffect(() => {
+    lastScrollY.current = window.scrollY;
+    setScrollY(window.scrollY);
+    let ticking = false;
+
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        const delta = y - lastScrollY.current;
+
+        setScrollY(y);
+
+        if (y <= 0) {
+          setHeaderHidden(false);
+        } else if (delta > SCROLL_DELTA && y > SCROLL_MIN_TO_HIDE) {
+          setHeaderHidden(true);
+        } else if (delta < -SCROLL_DELTA) {
+          setHeaderHidden(false);
+        }
+
+        lastScrollY.current = y;
+        ticking = false;
+      });
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
 
   useEffect(() => {
     const query = `(max-width: ${SITE_MIN_VIEWPORT_PX - 1}px)`;
@@ -73,32 +117,41 @@ export function SiteLayout() {
         inert={narrow ? true : undefined}
       >
         <header
-          className={
-            isOverlayHeader ? "site-top" : "site-top site-top--solid"
-          }
+          className={[
+            "site-top",
+            isHeroFloatNav ? "site-top--hero" : "",
+            headerHidden ? "site-top--hidden" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
-          <div className="site-top__ig">
+          <div className="site-top__bar">
             <NavLink
-              className="site-top__ig-link"
+              className="site-top__brand"
               to="/"
               end
               aria-label={`Inicio — ${SITE_NAME}`}
             >
-              <span className="site-top__ig-text">{SITE_NAME}</span>
+              <span className="site-top__brand-text">{SITE_NAME}</span>
             </NavLink>
+            <nav className="site-nav" aria-label="Principal">
+              <ul className="site-nav__list">
+                {nav.map(({ to, label, end }) => (
+                  <li key={to}>
+                    <NavLink
+                      to={to}
+                      end={Boolean(end)}
+                      className={({ isActive }) =>
+                        isActive ? "site-nav__link is-active" : "site-nav__link"
+                      }
+                    >
+                      {label}
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
-          <nav className="site-nav" aria-label="Principal">
-            {nav.map(({ to, label, end }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={Boolean(end)}
-                className={({ isActive }) => (isActive ? "is-active" : undefined)}
-              >
-                {label}
-              </NavLink>
-            ))}
-          </nav>
         </header>
 
         <main key={pathname} className="page-shell">
