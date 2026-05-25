@@ -367,6 +367,45 @@ html.viewport-too-narrow body {
   display: block;
 }
 
+/* Hero carrusel: fotos horizontales a pantalla completa */
+.hero__carousel {
+  position: relative;
+  flex: 1 1 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.hero__carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+
+.hero__carousel-slide--active {
+  opacity: 1;
+  z-index: 1;
+  pointer-events: auto;
+}
+
+.hero__carousel-slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__carousel-slide {
+    transition: none;
+  }
+}
+
 /* Hero dinámico: dos columnas 50/50 — ver HeroDynamicSplit */
 .hero__split {
   display: grid;

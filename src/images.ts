@@ -30,6 +30,13 @@ export const IMAGES = {
   imgblog2: "/imgblog2.jpeg",
 } as const;
 
+/** Hero home: carrusel de fotos horizontales en /public */
+export const HERO_HORIZONTAL_IMAGES: readonly string[] = [
+  "/herohori1.jpeg",
+  "/herohori2.jpeg",
+  "/herohori3.jpeg",
+] as const;
+
 /** Rutas de fotos en /public para elegir 3 al azar (p. ej. sección Labor). */
 export const GALLERY_POOL: readonly string[] = Object.values(
   IMAGES
