@@ -76,22 +76,34 @@ export function clearCms(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
 
-/** El seed define qué piezas existen; el CMS solo puede editar las que siguen en seed. */
+/** El seed es la base; el CMS puede editar existentes y añadir piezas nuevas. */
 export function mergePiezasWithSeed(stored: Pieza[] | null, seed: Pieza[]): Pieza[] {
   if (!stored) return seed;
   const storedById = new Map(stored.map((p) => [p.id, p]));
-  return seed.map((s) => {
+  const seedIds = new Set(seed.map((s) => s.id));
+
+  const merged = seed.map((s) => {
     const override = storedById.get(s.id);
     return override ? { ...s, ...override, id: s.id } : s;
   });
+
+  const extras = stored.filter((p) => p.id && !seedIds.has(p.id));
+  return extras.length > 0 ? [...merged, ...extras] : merged;
 }
 
-/** El seed define qué entradas existen; el CMS solo puede editar las que siguen en seed. */
+/** El seed es la base; el CMS puede editar existentes y añadir entradas nuevas. */
 export function mergePostsWithSeed(stored: Post[] | null, seed: Post[]): Post[] {
   if (!stored) return seed;
   const storedById = new Map(stored.map((p) => [p.id, p]));
-  return seed.map((s) => {
+  const seedIds = new Set(seed.map((s) => s.id));
+
+  const merged = seed.map((s) => {
     const override = storedById.get(s.id);
     return override ? normalizeStoredPost({ ...s, ...override, id: s.id }) : s;
   });
+
+  const extras = stored
+    .filter((p) => p.id && !seedIds.has(p.id))
+    .map(normalizeStoredPost);
+  return extras.length > 0 ? [...merged, ...extras] : merged;
 }
