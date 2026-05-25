@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { Pieza, Post, TecnicaPieza } from "../types/content";
 import { useContent } from "../context/ContentContext";
 import { normalizeStoredPost } from "../data/contentStore";
@@ -39,9 +39,9 @@ function newEmptyPost(): Post {
   };
 }
 
-const PORTADA_MAX_BYTES = 2.5 * 1024 * 1024;
+const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
 
-function readPortadaFile(file: File): Promise<string> {
+function readImageFile(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
@@ -56,9 +56,41 @@ export function AdminPage() {
   const [piezaDraft, setPiezaDraft] = useState<Pieza | null>(null);
   const [postDraft, setPostDraft] = useState<Post | null>(null);
   const portadaFileRef = useRef<HTMLInputElement>(null);
+  const piezaImagesFileRef = useRef<HTMLInputElement>(null);
 
-  const piezaLines = useMemo(
-    () => (piezaDraft ? piezaDraft.imagenes.join("\n") : ""),
+  const addPiezaImagesFromFiles = useCallback(
+    async (files: FileList | null) => {
+      if (!files?.length || !piezaDraft) return;
+
+      const next = [...piezaDraft.imagenes];
+      for (const file of Array.from(files)) {
+        if (file.size > IMAGE_MAX_BYTES) {
+          window.alert(
+            `"${file.name}" supera ~2,5 MB. Comprímela o usa otra imagen.`
+          );
+          continue;
+        }
+        try {
+          next.push(await readImageFile(file));
+        } catch {
+          window.alert(`No se pudo leer "${file.name}".`);
+        }
+      }
+
+      setPiezaDraft({ ...piezaDraft, imagenes: next });
+      if (piezaImagesFileRef.current) piezaImagesFileRef.current.value = "";
+    },
+    [piezaDraft]
+  );
+
+  const removePiezaImage = useCallback(
+    (index: number) => {
+      if (!piezaDraft) return;
+      setPiezaDraft({
+        ...piezaDraft,
+        imagenes: piezaDraft.imagenes.filter((_, i) => i !== index),
+      });
+    },
     [piezaDraft]
   );
 
@@ -66,7 +98,7 @@ export function AdminPage() {
     if (!piezaDraft) return;
     const imagenes = piezaDraft.imagenes.map((s) => s.trim()).filter(Boolean);
     if (imagenes.length === 0) {
-      window.alert("Añade al menos una URL de imagen (una por línea).");
+      window.alert("Añade al menos una imagen.");
       return;
     }
     const next = { ...piezaDraft, imagenes };
@@ -157,8 +189,8 @@ export function AdminPage() {
         <h1>Administración</h1>
         <p className="page-header__lede">
           Edición del catálogo de piezas y de la bitácora. Los cambios se guardan
-          en este navegador (localStorage). Para imágenes nuevas, súbelas a{" "}
-          <code>public/</code> y usa rutas como <code>/archivo.jpg</code>.
+          en este navegador (localStorage). Las imágenes se eligen desde tu
+          equipo y quedan guardadas en este navegador.
         </p>
       </header>
 
@@ -307,20 +339,58 @@ export function AdminPage() {
                     ))}
                   </select>
                 </label>
-                <label className="admin-field">
-                  URLs de imágenes (una por línea, rutas en public)
-                  <textarea
-                    value={piezaLines}
-                    onChange={(e) =>
-                      setPiezaDraft({
-                        ...piezaDraft,
-                        imagenes: e.target.value.split(/\n/).map((s) => s.trim()),
-                      })
-                    }
-                    rows={5}
-                    placeholder="/foto1.jpg&#10;/foto2.jpg"
-                  />
-                </label>
+                <div className="admin-field">
+                  <span className="admin-field__label-text">Imágenes</span>
+                  <p className="admin-field__help">
+                    Elegí una o más fotos desde tu equipo. Se guardan en este
+                    navegador (como la portada de la bitácora).
+                  </p>
+                  <div className="admin-portada-row">
+                    <label className="admin-file-label admin-file-label--inline">
+                      Elegir imágenes…
+                      <input
+                        ref={piezaImagesFileRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        multiple
+                        className="admin-file-input"
+                        onChange={(e) => {
+                          void addPiezaImagesFromFiles(e.target.files);
+                        }}
+                      />
+                    </label>
+                    {piezaDraft.imagenes.length > 0 ? (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--secondary"
+                        onClick={() => {
+                          setPiezaDraft({ ...piezaDraft, imagenes: [] });
+                          if (piezaImagesFileRef.current) {
+                            piezaImagesFileRef.current.value = "";
+                          }
+                        }}
+                      >
+                        Quitar todas
+                      </button>
+                    ) : null}
+                  </div>
+                  {piezaDraft.imagenes.length > 0 ? (
+                    <ul className="admin-imagenes-grid" role="list">
+                      {piezaDraft.imagenes.map((src, index) => (
+                        <li key={`${src.slice(0, 48)}-${index}`} className="admin-imagenes-thumb">
+                          <img src={src} alt="" />
+                          <button
+                            type="button"
+                            className="admin-imagenes-thumb__remove"
+                            onClick={() => removePiezaImage(index)}
+                          >
+                            Quitar
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
                 <label className="admin-field admin-field--inline">
                   <input
                     type="checkbox"
@@ -454,7 +524,7 @@ export function AdminPage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file || !postDraft) return;
-                          if (file.size > PORTADA_MAX_BYTES) {
+                          if (file.size > IMAGE_MAX_BYTES) {
                             window.alert(
                               "La imagen supera ~2,5 MB. Comprímela o coloca el archivo en public/ y usa la ruta."
                             );
@@ -462,7 +532,7 @@ export function AdminPage() {
                             return;
                           }
                           try {
-                            const dataUrl = await readPortadaFile(file);
+                            const dataUrl = await readImageFile(file);
                             setPostDraft({ ...postDraft, portada: dataUrl });
                           } catch {
                             window.alert("No se pudo leer la imagen.");
