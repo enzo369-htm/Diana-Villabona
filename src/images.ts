@@ -28,13 +28,16 @@ export const IMAGES = {
   muestraFormulacionEsmaltes: "/muestra-formulacion-esmaltes.jpg",
   imgblog1: "/imgblog1.jpg",
   imgblog2: "/imgblog2.jpeg",
+  imghero: "/imghero.jpg",
+  imgherohori: "/imgherohori.jpeg",
 } as const;
 
-/** Hero home: carrusel de fotos horizontales en /public */
+/** Hero home: carrusel a pantalla completa */
 export const HERO_HORIZONTAL_IMAGES: readonly string[] = [
   "/herohori1.jpeg",
   "/herohori2.jpeg",
-  "/herohori3.jpeg",
+  IMAGES.imghero,
+  IMAGES.imgherohori,
 ] as const;
 
 /** Rutas de fotos en /public para elegir 3 al azar (p. ej. sección Labor). */
