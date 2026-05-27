@@ -3597,3 +3597,122 @@ article.page-content.page-content--pad.editorial {
   opacity: 0.8;
   margin: 0;
 }
+
+/* —— Ventana de contacto —— */
+.contacto-page {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: min(88vh, calc(100dvh - var(--site-header-h, 3.35rem)));
+  padding: clamp(3rem, 8vh, 5rem) clamp(1.25rem, 4vw, 2rem);
+  box-sizing: border-box;
+  background: var(--surface-panel);
+}
+
+.contacto-page__inner {
+  width: 100%;
+  max-width: 32rem;
+}
+
+.contacto-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.contacto-form__field {
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink-muted) 35%, var(--line));
+  margin-bottom: clamp(1.75rem, 4vh, 2.35rem);
+}
+
+.contacto-form__field--message {
+  margin-bottom: clamp(2.25rem, 5vh, 3rem);
+}
+
+.contacto-form__label {
+  display: block;
+  margin: 0 0 0.65rem;
+  font-family: var(--sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ink-muted) 88%, var(--ink));
+}
+
+.contacto-form__input {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 0.85rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  font-family: var(--sans);
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--ink);
+  outline: none;
+  box-shadow: none;
+}
+
+.contacto-form__input::placeholder {
+  color: color-mix(in srgb, var(--ink-muted) 72%, transparent);
+  opacity: 1;
+}
+
+.contacto-form__input:focus {
+  outline: none;
+}
+
+.contacto-form__field:focus-within {
+  border-bottom-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+
+.contacto-form__textarea {
+  resize: vertical;
+  min-height: 6.5rem;
+  padding-bottom: 0.65rem;
+}
+
+.contacto-form__submit {
+  width: 100%;
+  margin: 0;
+  padding: 1.05rem 1.5rem;
+  border: none;
+  border-radius: 2px;
+  background: #2f4539;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #f5f2eb;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.2s ease,
+    box-shadow 0.25s ease;
+}
+
+.contacto-form__submit:hover {
+  background: #243a30;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(47, 69, 57, 0.22);
+}
+
+.contacto-form__submit:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 480px) {
+  .contacto-page {
+    min-height: auto;
+    align-items: flex-start;
+    padding-top: clamp(4rem, 12vw, 5rem);
+  }
+}
