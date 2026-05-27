@@ -1,19 +1,19 @@
-import { talleres } from "../data/seed";
+import { useMemo } from "react";
+import { talleresParaGrilla } from "../data/talleresSelectors";
+import { useContent } from "../context/ContentContext";
 import { whatsappLink } from "../siteConfig";
+import type { Taller } from "../types/content";
 import { TalleresIntro } from "./TalleresIntro";
 
-function EstadoBadge({ estado }: { estado: string }) {
-  const labels: Record<string, string> = {
-    proximo: "Próximo",
-    en_curso: "En curso",
-    archivo: "Archivo",
-  };
-  return <span className="taller-badge">{labels[estado] ?? estado}</span>;
+function tallerExplorarHref(t: Taller): string {
+  const link = t.enlace?.trim();
+  if (link) return link;
+  return whatsappLink(`Hola Diana, me interesa el taller «${t.titulo}».`);
 }
 
 export function TalleresPage() {
-  const proximos = talleres.filter((t) => t.estado !== "archivo");
-  const archivo = talleres.filter((t) => t.estado === "archivo");
+  const { talleres } = useContent();
+  const grilla = useMemo(() => talleresParaGrilla(talleres), [talleres]);
   const inscripcion = whatsappLink(
     "Hola Diana, me interesa inscribirme o pedir información sobre un taller."
   );
@@ -25,54 +25,36 @@ export function TalleresPage() {
       <div className="page-content page-content--pad page-content--talleres">
         <header className="page-header page-header--talleres">
           <p className="page-header__lede">
-            Experiencias en el estudio: fechas actuales y archivo de encuentros
-            pasados. La inscripción es por WhatsApp para mantener el diálogo
-            cercano.
+            Experiencias en el taller: fechas actuales y archivo de encuentros
+            pasados.
           </p>
         </header>
 
-        <section className="talleres-section" aria-labelledby="t-prox">
-          <h2 id="t-prox" className="talleres-section__heading">
-            Actuales y próximos
-          </h2>
-          {proximos.length === 0 ? (
+        <section className="talleres-section" aria-label="Talleres">
+          {grilla.length === 0 ? (
             <p>Pronto publicaremos nuevas fechas.</p>
           ) : (
-            <ul className="talleres-list" role="list">
-              {proximos.map((t) => (
-                <li key={t.id} className={`talleres-card talleres-card--${t.estado}`}>
-                  <div className="talleres-card__inner">
-                    <div className="talleres-card__meta">
-                      <EstadoBadge estado={t.estado} />
-                      <time dateTime={t.fecha}>{t.fecha}</time>
-                    </div>
-                    <h3>{t.titulo}</h3>
+            <ul className="talleres-grid" role="list">
+              {grilla.map((t) => (
+                <li
+                  key={t.id}
+                  className={`talleres-card talleres-card--${t.estado}`}
+                >
+                  <article className="talleres-card__inner">
+                    <h3 className="talleres-card__title">{t.titulo}</h3>
                     <p className="talleres-card__desc">{t.descripcion}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="talleres-section" aria-labelledby="t-arch">
-          <h2 id="t-arch" className="talleres-section__heading">
-            Archivo
-          </h2>
-          {archivo.length === 0 ? (
-            <p>Sin talleres en archivo por ahora.</p>
-          ) : (
-            <ul className="talleres-list talleres-list--archive" role="list">
-              {archivo.map((t) => (
-                <li key={t.id} className={`talleres-card talleres-card--${t.estado}`}>
-                  <div className="talleres-card__inner">
-                    <div className="talleres-card__meta">
-                      <EstadoBadge estado={t.estado} />
-                      <time dateTime={t.fecha}>{t.fecha}</time>
-                    </div>
-                    <h3>{t.titulo}</h3>
-                    <p className="talleres-card__desc">{t.descripcion}</p>
-                  </div>
+                    <a
+                      className="talleres-card__cta"
+                      href={tallerExplorarHref(t)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Explorar
+                      <span className="talleres-card__cta-arrow" aria-hidden>
+                        →
+                      </span>
+                    </a>
+                  </article>
                 </li>
               ))}
             </ul>

@@ -86,16 +86,54 @@ export const talleres: Taller[] = [
     titulo: "Quema experimental: intro a Raku",
     fecha: "2026-06-07",
     descripcion:
-      "Jornada en el estudio: preparación de piezas, reducción y enfriamiento brusco. Cupos limitados.",
+      "Muchas veces buscamos resultados, pero estamos lejos de la materia. Jornada en el estudio: preparación de piezas, reducción y enfriamiento brusco. Cupos limitados.",
     estado: "proximo",
+    orden: 1,
   },
   {
     id: "t2",
+    titulo: "Saggar: materia y fuego",
+    fecha: "2026-08-14",
+    descripcion:
+      "Encuentro para explorar materiales orgánicos, envolturas y la sorpresa del horno. Trabajamos piezas en gres y registramos cada quema con calma.",
+    estado: "proximo",
+    orden: 2,
+  },
+  {
+    id: "t3",
+    titulo: "Introducción al torno",
+    fecha: "2026-09-20",
+    descripcion:
+      "Primeros pasos en el torno: centrado, elevación y formas simples. Priorizamos escuchar el barro y entender el gesto antes que el resultado.",
+    estado: "proximo",
+    orden: 3,
+  },
+  {
+    id: "t4",
+    titulo: "Esmaltes y formulación",
+    fecha: "2026-10-11",
+    descripcion:
+      "Estos últimos meses he tenido encuentros muy valiosos que me han regresado a la importancia de entender el material, los procesos y la materia en su conjunto.",
+    estado: "proximo",
+    orden: 4,
+  },
+  {
+    id: "t5",
+    titulo: "Círculo de modelado",
+    fecha: "2025-05-18",
+    descripcion:
+      "Sesión abierta de modelado y observación. Compartimos técnicas de pellizco, placa y superficie sin apuro por terminar piezas.",
+    estado: "archivo",
+    orden: 5,
+  },
+  {
+    id: "t6",
     titulo: "Saggar en primavera",
     fecha: "2025-11-02",
     descripcion:
-      "Taller cerrado. Archivo de materiales orgánicos que usamos y de los resultados en gres.",
+      "Taller cerrado. Archivo de materiales orgánicos que usamos y de los resultados en gres. Una mirada al proceso más que al objeto final.",
     estado: "archivo",
+    orden: 6,
   },
 ];
 

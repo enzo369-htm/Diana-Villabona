@@ -39,7 +39,13 @@ export interface Taller {
   fecha: string;
   descripcion: string;
   estado: EstadoTaller;
+  /** URL del botón Explorar (WhatsApp, formulario, etc.). Vacío = WhatsApp por defecto. */
+  enlace?: string;
+  /** Orden en la grilla (menor = primero). Máx. 6 visibles en la página. */
+  orden?: number;
 }
+
+export const TALLERES_GRILLA_MAX = 6;
 
 /** Obra en el muestrario de portfolio (6 fotos + texto). */
 export interface ObraPortfolio {

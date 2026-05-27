@@ -1,13 +1,16 @@
 import { Link } from "react-router-dom";
 import { useCallback, useRef, useState } from "react";
-import type { ObraPortfolio, Pieza, Post, TecnicaPieza } from "../types/content";
+import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
+
 import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
 import { useContent } from "../context/ContentContext";
 import {
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
+  normalizeStoredTaller,
 } from "../data/contentStore";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
+import { AdminTalleresTab } from "./AdminTalleresTab";
 
 const TECNICAS: TecnicaPieza[] = [
   "Raku",
@@ -56,12 +59,24 @@ function readImageFile(file: File): Promise<string> {
 }
 
 export function AdminPage() {
-  const { piezas, posts, obrasPortfolio, setPiezas, setPosts, setObrasPortfolio, resetToSeed } =
-    useContent();
-  const [tab, setTab] = useState<"piezas" | "bitacora" | "portfolio">("piezas");
+  const {
+    piezas,
+    posts,
+    obrasPortfolio,
+    talleres,
+    setPiezas,
+    setPosts,
+    setObrasPortfolio,
+    setTalleres,
+    resetToSeed,
+  } = useContent();
+  const [tab, setTab] = useState<
+    "piezas" | "bitacora" | "portfolio" | "talleres"
+  >("piezas");
   const [piezaDraft, setPiezaDraft] = useState<Pieza | null>(null);
   const [postDraft, setPostDraft] = useState<Post | null>(null);
   const [obraDraft, setObraDraft] = useState<ObraPortfolio | null>(null);
+  const [tallerDraft, setTallerDraft] = useState<Taller | null>(null);
   const portadaFileRef = useRef<HTMLInputElement>(null);
   const piezaImagesFileRef = useRef<HTMLInputElement>(null);
 
@@ -182,9 +197,38 @@ export function AdminPage() {
     setObraDraft(null);
   }, [obraDraft, obrasPortfolio, setObrasPortfolio]);
 
+  const saveTaller = useCallback(() => {
+    if (!tallerDraft) return;
+    const titulo = tallerDraft.titulo.trim();
+    if (!titulo) {
+      window.alert("Escribe un título.");
+      return;
+    }
+    const next = normalizeStoredTaller({
+      ...tallerDraft,
+      titulo,
+      descripcion: tallerDraft.descripcion.trim(),
+      enlace: tallerDraft.enlace?.trim() || undefined,
+    });
+    const idx = talleres.findIndex((t) => t.id === next.id);
+    if (idx >= 0) {
+      const copy = [...talleres];
+      copy[idx] = next;
+      setTalleres(copy);
+    } else {
+      setTalleres([...talleres, next]);
+    }
+  }, [tallerDraft, talleres, setTalleres]);
+
+  const deleteTaller = useCallback(() => {
+    if (!tallerDraft || !window.confirm("¿Eliminar este taller?")) return;
+    setTalleres(talleres.filter((t) => t.id !== tallerDraft.id));
+    setTallerDraft(null);
+  }, [tallerDraft, talleres, setTalleres]);
+
   const exportJson = useCallback(() => {
     const blob = new Blob(
-      [JSON.stringify({ piezas, posts, obrasPortfolio }, null, 2)],
+      [JSON.stringify({ piezas, posts, obrasPortfolio, talleres }, null, 2)],
       {
       type: "application/json",
     }
@@ -194,7 +238,7 @@ export function AdminPage() {
     a.download = "diana-villabona-catalogo-bitacora.json";
     a.click();
     URL.revokeObjectURL(a.href);
-  }, [piezas, posts, obrasPortfolio]);
+  }, [piezas, posts, obrasPortfolio, talleres]);
 
   const importJson = useCallback(
     (file: File | null) => {
@@ -206,6 +250,7 @@ export function AdminPage() {
             piezas: Pieza[];
             posts: Post[];
             obrasPortfolio: ObraPortfolio[];
+            talleres: Taller[];
           }>;
           if (Array.isArray(d.piezas) && Array.isArray(d.posts)) {
             setPiezas(d.piezas);
@@ -215,9 +260,15 @@ export function AdminPage() {
                 ? d.obrasPortfolio.map(normalizeStoredObraPortfolio)
                 : []
             );
+            setTalleres(
+              Array.isArray(d.talleres)
+                ? d.talleres.map(normalizeStoredTaller)
+                : []
+            );
             setPiezaDraft(null);
             setPostDraft(null);
             setObraDraft(null);
+            setTallerDraft(null);
           }
         } catch {
           window.alert("No se pudo leer el JSON.");
@@ -225,7 +276,7 @@ export function AdminPage() {
       };
       reader.readAsText(file);
     },
-    [setPiezas, setPosts, setObrasPortfolio]
+    [setPiezas, setPosts, setObrasPortfolio, setTalleres]
   );
 
   return (
@@ -233,7 +284,7 @@ export function AdminPage() {
       <header className="page-header">
         <h1>Administración</h1>
         <p className="page-header__lede">
-          Edición del catálogo, portfolio y bitácora. Los cambios se guardan en
+          Edición del catálogo, portfolio, talleres y bitácora. Los cambios se guardan en
           este navegador (localStorage). Las imágenes se eligen desde tu equipo.
         </p>
       </header>
@@ -264,6 +315,7 @@ export function AdminPage() {
               setPiezaDraft(null);
               setPostDraft(null);
               setObraDraft(null);
+              setTallerDraft(null);
             }
           }}
         >
@@ -289,6 +341,15 @@ export function AdminPage() {
           onClick={() => setTab("portfolio")}
         >
           Portfolio
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "talleres"}
+          className={tab === "talleres" ? "admin-tab admin-tab--on" : "admin-tab"}
+          onClick={() => setTab("talleres")}
+        >
+          Talleres
         </button>
         <button
           type="button"
@@ -507,6 +568,14 @@ export function AdminPage() {
           setDraft={setObraDraft}
           onSave={saveObra}
           onDelete={deleteObra}
+        />
+      ) : tab === "talleres" ? (
+        <AdminTalleresTab
+          talleres={talleres}
+          draft={tallerDraft}
+          setDraft={setTallerDraft}
+          onSave={saveTaller}
+          onDelete={deleteTaller}
         />
       ) : (
         <div className="admin-split">

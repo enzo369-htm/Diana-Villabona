@@ -1,4 +1,4 @@
-import type { ObraPortfolio, Pieza, Post } from "../types/content";
+import type { ObraPortfolio, Pieza, Post, Taller } from "../types/content";
 import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
 
 const STORAGE_KEY = "dvc-cms-catalogo-v1";
@@ -7,6 +7,7 @@ export type StoredCms = {
   piezas: Pieza[];
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
+  talleres: Taller[];
 };
 
 /** Migra entradas guardadas con el campo antiguo `cuerpoHtml` (HTML → texto). */
@@ -74,6 +75,31 @@ export function normalizeStoredObraPortfolio(raw: unknown): ObraPortfolio {
   };
 }
 
+export function normalizeStoredTaller(raw: unknown): Taller {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const id =
+    typeof o.id === "string" && o.id.length > 0 ? o.id : `t-${Date.now()}`;
+  const estadoRaw = o.estado;
+  const estado: Taller["estado"] =
+    estadoRaw === "proximo" || estadoRaw === "en_curso" || estadoRaw === "archivo"
+      ? estadoRaw
+      : "proximo";
+  const enlace =
+    typeof o.enlace === "string" && o.enlace.trim() ? o.enlace.trim() : undefined;
+
+  return {
+    id,
+    titulo: typeof o.titulo === "string" ? o.titulo : "",
+    fecha: typeof o.fecha === "string" ? o.fecha : "",
+    descripcion: typeof o.descripcion === "string" ? o.descripcion : "",
+    estado,
+    ...(enlace ? { enlace } : {}),
+    ...(typeof o.orden === "number" && Number.isFinite(o.orden)
+      ? { orden: o.orden }
+      : {}),
+  };
+}
+
 export function loadCms(): StoredCms | null {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -82,6 +108,7 @@ export function loadCms(): StoredCms | null {
       piezas: Pieza[];
       posts: unknown[];
       obrasPortfolio: unknown[];
+      talleres: unknown[];
     }>;
     if (!Array.isArray(data.piezas) || !Array.isArray(data.posts)) return null;
     return {
@@ -89,6 +116,9 @@ export function loadCms(): StoredCms | null {
       posts: data.posts.map(normalizeStoredPost),
       obrasPortfolio: Array.isArray(data.obrasPortfolio)
         ? data.obrasPortfolio.map(normalizeStoredObraPortfolio)
+        : [],
+      talleres: Array.isArray(data.talleres)
+        ? data.talleres.map(normalizeStoredTaller)
         : [],
     };
   } catch {
@@ -155,5 +185,27 @@ export function mergeObrasPortfolioWithSeed(
   const extras = stored
     .filter((o) => o.id && !seedIds.has(o.id))
     .map(normalizeStoredObraPortfolio);
+  return extras.length > 0 ? [...merged, ...extras] : merged;
+}
+
+/** El seed es la base; el CMS puede editar existentes y añadir talleres nuevos. */
+export function mergeTalleresWithSeed(
+  stored: Taller[] | null,
+  seed: Taller[]
+): Taller[] {
+  if (!stored) return seed;
+  const storedById = new Map(stored.map((t) => [t.id, t]));
+  const seedIds = new Set(seed.map((s) => s.id));
+
+  const merged = seed.map((s) => {
+    const override = storedById.get(s.id);
+    return override
+      ? normalizeStoredTaller({ ...s, ...override, id: s.id })
+      : s;
+  });
+
+  const extras = stored
+    .filter((t) => t.id && !seedIds.has(t.id))
+    .map(normalizeStoredTaller);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }
