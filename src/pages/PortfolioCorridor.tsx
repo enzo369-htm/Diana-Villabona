@@ -15,7 +15,7 @@ function PortfolioCell({
   return (
     <Link
       to={`/portfolio/${cell.obraId}`}
-      className="portfolio-band__cell hero__cell portfolio-band__link home-vitrina__card"
+      className="portfolio-band__cell hero__cell portfolio-band__link"
     >
       <img
         src={cell.src}
@@ -26,15 +26,13 @@ function PortfolioCell({
         decoding="async"
         {...(priority ? { fetchPriority: "high" as const } : {})}
       />
-      <div className="home-vitrina__copy">
-        <h3>{cell.titulo}</h3>
-        <span className="home-vitrina__cta">
-          Ver ficha
-          <span className="home-vitrina__cta-arrow" aria-hidden>
-            →
-          </span>
+      <span className="portfolio-band__title">{cell.titulo}</span>
+      <span className="portfolio-band__cta">
+        Explorar
+        <span className="portfolio-band__cta-arrow" aria-hidden>
+          →
         </span>
-      </div>
+      </span>
     </Link>
   );
 }
