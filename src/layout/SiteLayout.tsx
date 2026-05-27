@@ -3,8 +3,6 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SiteFooter } from "../components/SiteFooter";
 import { SITE_NAME } from "../siteConfig";
 
-/** Coincide con `--site-min-viewport-width` en App.css (aprox. 12" en horizontal). */
-const SITE_MIN_VIEWPORT_PX = 1280;
 const SCROLL_DELTA = 8;
 const SCROLL_MIN_TO_HIDE = 72;
 /** En home: solo arriba del todo el nav flota sobre el hero (sin barra). */
@@ -21,11 +19,6 @@ const nav: { to: string; label: string; end?: boolean }[] = [
 export function SiteLayout() {
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
-  const [narrow, setNarrow] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia(`(max-width: ${SITE_MIN_VIEWPORT_PX - 1}px)`).matches
-      : false
-  );
   const [headerHidden, setHeaderHidden] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const lastScrollY = useRef(0);
@@ -78,44 +71,9 @@ export function SiteLayout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  useEffect(() => {
-    const query = `(max-width: ${SITE_MIN_VIEWPORT_PX - 1}px)`;
-    const mq = window.matchMedia(query);
-    const sync = () => {
-      const m = mq.matches;
-      setNarrow(m);
-      document.documentElement.classList.toggle("viewport-too-narrow", m);
-    };
-    sync();
-    mq.addEventListener("change", sync);
-    return () => {
-      mq.removeEventListener("change", sync);
-      document.documentElement.classList.remove("viewport-too-narrow");
-    };
-  }, []);
-
   return (
     <div className="app">
-      <div
-        className="viewport-min-gate"
-        role="alertdialog"
-        aria-modal="true"
-        aria-labelledby="viewport-gate-title"
-        aria-describedby="viewport-gate-desc"
-      >
-        <h1 id="viewport-gate-title" className="viewport-min-gate__title">
-          Pantalla demasiado pequeña
-        </h1>
-        <p id="viewport-gate-desc" className="viewport-min-gate__text">
-          Este sitio está pensado para pantallas de al menos 12&quot; (ancho mínimo
-          aproximado {SITE_MIN_VIEWPORT_PX}&nbsp;px). Ampliá la ventana del
-          navegador o usá una computadora o tablet en horizontal.
-        </p>
-      </div>
-      <div
-        className="app__surface"
-        inert={narrow ? true : undefined}
-      >
+      <div className="app__surface">
         <header
           className={[
             "site-top",

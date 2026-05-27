@@ -15,8 +15,6 @@
   --track: 0.35em;
   --r-pill: 999px;
   --shadow: 0 12px 40px rgba(20, 18, 16, 0.08);
-  /* Ancho mínimo del sitio (~pantalla 12" en horizontal / portátil pequeño). */
-  --site-min-viewport-width: 1280px;
   --site-header-h: 3.35rem;
   --site-nav-pad-x: clamp(1.15rem, 2.8vw, 2rem);
 }
@@ -80,56 +78,6 @@ a:hover {
   flex-direction: column;
   min-height: 100vh;
   background: #fff;
-}
-
-/* —— Bloqueo por viewport estrecho (alineado a --site-min-viewport-width) —— */
-.viewport-min-gate {
-  display: none;
-}
-
-@media (max-width: 1279px) {
-  .viewport-min-gate {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    padding: clamp(1.25rem, 5vw, 2.5rem);
-    text-align: center;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-  }
-
-  .viewport-min-gate__title {
-    font-family: var(--serif);
-    font-size: clamp(1.35rem, 4.5vw, 1.85rem);
-    font-weight: 500;
-    margin: 0;
-    line-height: 1.25;
-    max-width: 22rem;
-  }
-
-  .viewport-min-gate__text {
-    margin: 0;
-    max-width: 28rem;
-    font-size: 0.95rem;
-    line-height: 1.55;
-    color: var(--ink-muted);
-  }
-}
-
-html.viewport-too-narrow,
-html.viewport-too-narrow body {
-  overflow: hidden;
-  height: 100%;
-}
-
-html.viewport-too-narrow body {
-  touch-action: none;
 }
 
 /* —— Top: barra editorial fija —— */
@@ -710,6 +658,85 @@ html.viewport-too-narrow body {
   display: block;
 }
 
+.portfolio-band__link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.portfolio-band__link.home-vitrina__card:hover {
+  text-decoration: none;
+}
+
+.portfolio-band__link.home-vitrina__card:hover img {
+  transform: scale(1.045);
+}
+
+.portfolio-band__link.home-vitrina__card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.portfolio-band__link.home-vitrina__card .home-vitrina__copy h3 {
+  font-size: clamp(1rem, 1.8vw, 1.65rem);
+  max-width: 16ch;
+}
+
+.portfolio-corridor__empty {
+  margin: 0;
+  padding-top: calc(var(--site-header-h) + 2rem);
+}
+
+/* —— Portfolio: ficha de obra —— */
+.portfolio-obra__head {
+  margin-bottom: clamp(2rem, 4vw, 2.75rem);
+}
+
+.portfolio-obra__title {
+  margin: 0 0 1rem;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4.2vw, 2.85rem);
+  font-weight: 400;
+  line-height: 1.12;
+  text-align: left;
+  color: var(--ink);
+}
+
+.portfolio-obra__text {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 1.02rem;
+  line-height: 1.65;
+  text-align: left;
+  color: var(--ink-muted);
+}
+
+.portfolio-obra__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.65rem, 1.2vw, 0.85rem);
+}
+
+.portfolio-obra__cell {
+  overflow: hidden;
+  background: var(--img-placeholder);
+  border-radius: 4px;
+}
+
+.portfolio-obra__cell img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (max-width: 720px) {
+  .portfolio-obra__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 700px) {
   .portfolio-band {
     display: flex;
@@ -766,22 +793,62 @@ html.viewport-too-narrow body {
   transform: translateY(-1px);
 }
 
-/* —— Segunda sección: estética tipográfica suiza (referencia Cargo) —— */
+/* —— Segunda sección: texto + vídeo 50/50 (referencia editorial) —— */
 .ceramica-swiss {
   --swiss-ink: #0a0a0a;
   --swiss-muted: #6b6b6b;
   --ceramica-card-pad-y: 60px;
   --ceramica-side: clamp(1.5rem, 4.5vw, 3.75rem);
+  --ceramica-split-h: min(88vh, 920px);
   width: 100%;
   max-width: 100%;
-  background: transparent;
+  padding: 0;
+  margin: 0;
+  background: var(--surface-panel);
   color: var(--swiss-ink);
   box-sizing: border-box;
-  /* Ancho a todo el viewport; solo márgenes verticales con el resto de la página */
-  padding: clamp(2.25rem, 4.5vh, 4rem) 0 clamp(2.75rem, 5.5vh, 4.75rem);
-  display: block;
-  overflow-x: hidden;
+  overflow: hidden;
   font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.ceramica-swiss__split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  min-height: var(--ceramica-split-h);
+}
+
+.ceramica-swiss__text {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: clamp(2rem, 5vw, 4.5rem) clamp(2rem, 5.5vw, 5rem);
+  box-sizing: border-box;
+}
+
+.ceramica-swiss__video-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  height: var(--ceramica-split-h);
+  min-height: var(--ceramica-split-h);
+  overflow: hidden;
+  background: transparent;
+}
+
+.ceramica-swiss__video {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: var(--ceramica-split-h);
+  object-fit: contain;
+  object-position: right center;
+  pointer-events: none;
 }
 
 .ceramica-swiss__inner {
@@ -800,34 +867,11 @@ html.viewport-too-narrow body {
 
 .ceramica-swiss__row {
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.55fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: center;
-  gap: clamp(1rem, 2vw, 1.75rem);
+  gap: clamp(1.5rem, 3vw, 2.75rem);
   width: 100%;
   min-width: 0;
-}
-
-.ceramica-swiss__video-wrap {
-  position: relative;
-  width: 100%;
-  max-width: min(100%, 300px);
-  min-width: 0;
-  justify-self: start;
-  aspect-ratio: 9 / 16;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #1a1a1a;
-  box-shadow: 0 16px 48px rgba(20, 18, 16, 0.14);
-}
-
-.ceramica-swiss__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
 }
 
 .ceramica-swiss__head {
@@ -893,6 +937,29 @@ html.viewport-too-narrow body {
   text-align: left;
 }
 
+.ceramica-swiss__quote--feature {
+  margin: 0;
+  padding: 0;
+  border: none;
+  font-family: "Lora", "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.15rem, 1.85vw, 1.65rem);
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.68;
+  letter-spacing: 0.012em;
+  color: var(--swiss-ink);
+}
+
+.ceramica-swiss__quote--feature .ceramica-swiss__quote-text {
+  margin: 0;
+  max-width: 34rem;
+  text-align: left;
+}
+
+.ceramica-swiss__quote--feature .ceramica-swiss__quote-text + .ceramica-swiss__quote-text {
+  margin-top: 1.25em;
+}
+
 .ceramica-swiss__title {
   margin: 0;
   width: fit-content;
@@ -928,29 +995,34 @@ html.viewport-too-narrow body {
 }
 
 @media (max-width: 720px) {
-  .ceramica-swiss__row {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  .ceramica-swiss {
+    --ceramica-split-h: min(58vh, 520px);
   }
 
-  .ceramica-swiss__title {
-    max-width: 26ch;
-    width: 100%;
-    justify-self: center;
-    transform: none;
+  .ceramica-swiss__split {
+    grid-template-columns: 1fr;
+  }
+
+  .ceramica-swiss__text {
+    order: 1;
+    padding: clamp(1.75rem, 6vw, 2.5rem) clamp(1.25rem, 5vw, 2rem);
   }
 
   .ceramica-swiss__video-wrap {
-    max-width: min(100%, 340px);
+    order: 2;
+  }
+
+  .ceramica-swiss__quote--feature {
+    font-size: clamp(1.08rem, 4.2vw, 1.35rem);
+  }
+
+  .ceramica-swiss__row {
+    grid-template-columns: 1fr;
+    justify-items: stretch;
   }
 }
 
 @media (max-width: 700px) {
-  .ceramica-swiss {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
   .ceramica-swiss__inner {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -3115,6 +3187,40 @@ article.page-content.page-content--pad.editorial {
 
 .admin-imagenes-thumb__remove:hover {
   text-decoration: underline;
+}
+
+.admin-portfolio-slots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.65rem;
+}
+
+.admin-portfolio-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--bg-elevated) 90%, #fff);
+}
+
+.admin-portfolio-slot__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.admin-portfolio-slot__preview img,
+.admin-portfolio-slot__empty {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 6px;
+  object-fit: cover;
+  display: block;
+  background: var(--img-placeholder);
 }
 
 .admin-field--inline {

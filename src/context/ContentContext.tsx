@@ -7,15 +7,25 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { Pieza, Post } from "../types/content";
+import type { ObraPortfolio, Pieza, Post } from "../types/content";
+import { obrasPortfolio as seedObrasPortfolio } from "../data/portfolioSeed";
 import { piezas as seedPiezas, posts as seedPosts } from "../data/seed";
-import { clearCms, loadCms, mergePiezasWithSeed, mergePostsWithSeed, saveCms } from "../data/contentStore";
+import {
+  clearCms,
+  loadCms,
+  mergeObrasPortfolioWithSeed,
+  mergePiezasWithSeed,
+  mergePostsWithSeed,
+  saveCms,
+} from "../data/contentStore";
 
 export type ContentContextValue = {
   piezas: Pieza[];
   posts: Post[];
+  obrasPortfolio: ObraPortfolio[];
   setPiezas: React.Dispatch<React.SetStateAction<Pieza[]>>;
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
+  setObrasPortfolio: React.Dispatch<React.SetStateAction<ObraPortfolio[]>>;
   resetToSeed: () => void;
 };
 
@@ -29,6 +39,10 @@ function cloneSeedPosts(): Post[] {
   return JSON.parse(JSON.stringify(seedPosts)) as Post[];
 }
 
+function cloneSeedObrasPortfolio(): ObraPortfolio[] {
+  return JSON.parse(JSON.stringify(seedObrasPortfolio)) as ObraPortfolio[];
+}
+
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [piezas, setPiezas] = useState<Pieza[]>(() => {
     const s = loadCms();
@@ -38,26 +52,36 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     const s = loadCms();
     return mergePostsWithSeed(s?.posts ?? null, cloneSeedPosts());
   });
+  const [obrasPortfolio, setObrasPortfolio] = useState<ObraPortfolio[]>(() => {
+    const s = loadCms();
+    return mergeObrasPortfolioWithSeed(
+      s?.obrasPortfolio ?? null,
+      cloneSeedObrasPortfolio()
+    );
+  });
 
   useEffect(() => {
-    saveCms({ piezas, posts });
-  }, [piezas, posts]);
+    saveCms({ piezas, posts, obrasPortfolio });
+  }, [piezas, posts, obrasPortfolio]);
 
   const resetToSeed = useCallback(() => {
     clearCms();
     setPiezas(cloneSeedPiezas());
     setPosts(cloneSeedPosts());
+    setObrasPortfolio(cloneSeedObrasPortfolio());
   }, []);
 
   const value = useMemo(
     (): ContentContextValue => ({
       piezas,
       posts,
+      obrasPortfolio,
       setPiezas,
       setPosts,
+      setObrasPortfolio,
       resetToSeed,
     }),
-    [piezas, posts, resetToSeed]
+    [piezas, posts, obrasPortfolio, resetToSeed]
   );
 
   return (

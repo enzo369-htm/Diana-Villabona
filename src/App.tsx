@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { SiteLayout } from "./layout/SiteLayout";
 import { PortfolioPage } from "./pages/PortfolioPage";
+import { PortfolioObraPage } from "./pages/PortfolioObraPage";
 import { HomePage } from "./pages/HomePage";
 import { PiezasPage } from "./pages/PiezasPage";
 import { PiezaDetailPage } from "./pages/PiezaDetailPage";
@@ -18,6 +19,7 @@ export default function App() {
         <Route element={<SiteLayout />}>
           <Route index element={<HomePage />} />
           <Route path="portfolio" element={<PortfolioPage />} />
+          <Route path="portfolio/:id" element={<PortfolioObraPage />} />
           <Route path="piezas" element={<PiezasPage />} />
           <Route path="piezas/:id" element={<PiezaDetailPage />} />
           <Route path="bitacora" element={<BitacoraPage />} />

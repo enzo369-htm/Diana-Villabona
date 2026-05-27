@@ -1,34 +1,59 @@
+import { Link } from "react-router-dom";
 import { useMemo } from "react";
-import {
-  buildPortfolioBands,
-  PORTFOLIO_IMAGES,
-} from "../data/portfolioImages";
+import { useContent } from "../context/ContentContext";
+import { buildPortfolioBands } from "../data/portfolioImages";
+import { obrasToMosaicCells } from "../data/selectors";
+import type { PortfolioMosaicCell } from "../data/portfolioImages";
 
 function PortfolioCell({
-  src,
+  cell,
   priority,
 }: {
-  src: string;
+  cell: PortfolioMosaicCell;
   priority?: boolean;
 }) {
   return (
-    <div className="portfolio-band__cell hero__cell">
+    <Link
+      to={`/portfolio/${cell.obraId}`}
+      className="portfolio-band__cell hero__cell portfolio-band__link home-vitrina__card"
+    >
       <img
-        src={src}
-        alt=""
+        src={cell.src}
+        alt={cell.titulo}
         width={800}
         height={1000}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
         {...(priority ? { fetchPriority: "high" as const } : {})}
       />
-    </div>
+      <div className="home-vitrina__copy">
+        <h3>{cell.titulo}</h3>
+        <span className="home-vitrina__cta">
+          Ver ficha
+          <span className="home-vitrina__cta-arrow" aria-hidden>
+            →
+          </span>
+        </span>
+      </div>
+    </Link>
   );
 }
 
 /** Pasillo vertical de mosaicos tipo rompecabezas. */
 export function PortfolioCorridor() {
-  const bands = useMemo(() => buildPortfolioBands(PORTFOLIO_IMAGES), []);
+  const { obrasPortfolio } = useContent();
+  const bands = useMemo(() => {
+    const cells = obrasToMosaicCells(obrasPortfolio);
+    return buildPortfolioBands(cells);
+  }, [obrasPortfolio]);
+
+  if (bands.length === 0) {
+    return (
+      <p className="portfolio-corridor__empty page-content page-content--pad">
+        Aún no hay obras en el portfolio.
+      </p>
+    );
+  }
 
   return (
     <div className="portfolio-corridor" role="presentation">
@@ -39,10 +64,10 @@ export function PortfolioCorridor() {
             bandIndex === 0 ? " portfolio-band--intro" : ""
           }`}
         >
-          {band.images.map((src, cellIndex) => (
+          {band.cells.map((cell, cellIndex) => (
             <PortfolioCell
-              key={`${bandIndex}-${cellIndex}-${src}`}
-              src={src}
+              key={`${cell.obraId}-${bandIndex}-${cellIndex}`}
+              cell={cell}
               priority={bandIndex === 0 && cellIndex === 0}
             />
           ))}

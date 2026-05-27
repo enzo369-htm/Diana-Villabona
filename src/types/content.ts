@@ -41,6 +41,19 @@ export interface Taller {
   estado: EstadoTaller;
 }
 
+/** Obra en el muestrario de portfolio (6 fotos + texto). */
+export interface ObraPortfolio {
+  id: string;
+  titulo: string;
+  texto: string;
+  /** Exactamente 6 imágenes: fila superior 1–3, inferior 4–6. La 1 es portada del mosaico. */
+  imagenes: string[];
+  /** Orden en el pasillo del portfolio (menor = primero). */
+  orden?: number;
+}
+
+export const OBRAS_PORTFOLIO_IMAGENES = 6;
+
 export interface HomeConfig {
   /** Rutas de imágenes del hero (orden = orden en el carrusel). */
   heroImagenes: string[];

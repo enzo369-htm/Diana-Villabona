@@ -1,5 +1,6 @@
 import { homeConfig } from "./seed";
-import type { Pieza, Post } from "../types/content";
+import type { ObraPortfolio, Pieza, Post } from "../types/content";
+import type { PortfolioMosaicCell } from "./portfolioImages";
 
 export function getPiezaById(piezas: Pieza[], id: string): Pieza | undefined {
   return piezas.find((p) => p.id === id);
@@ -49,4 +50,30 @@ export function postsOrdenados(posts: Post[]): Post[] {
     if (tb !== ta) return tb - ta;
     return a.id.localeCompare(b.id);
   });
+}
+
+export function getObraPortfolioById(
+  obras: ObraPortfolio[],
+  id: string
+): ObraPortfolio | undefined {
+  return obras.find((o) => o.id === id);
+}
+
+export function obrasPortfolioOrdenadas(obras: ObraPortfolio[]): ObraPortfolio[] {
+  return [...obras].sort((a, b) => {
+    const oa = a.orden ?? 9999;
+    const ob = b.orden ?? 9999;
+    if (oa !== ob) return oa - ob;
+    return a.id.localeCompare(b.id);
+  });
+}
+
+export function obrasToMosaicCells(obras: ObraPortfolio[]): PortfolioMosaicCell[] {
+  return obrasPortfolioOrdenadas(obras)
+    .map((o) => ({
+      obraId: o.id,
+      titulo: o.titulo,
+      src: o.imagenes[0]?.trim() ?? "",
+    }))
+    .filter((c) => c.src);
 }
