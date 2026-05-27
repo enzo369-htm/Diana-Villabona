@@ -1,6 +1,9 @@
 import { NavLink } from "react-router-dom";
 import { CONTACT_EMAIL, INSTAGRAM_URL } from "../siteConfig";
 
+const FOOTER_QUOTE =
+  "Lo más hermoso y profundo de la cerámica es dejarse usar como medio para que la naturaleza se exprese a sí misma.";
+
 const sections: { to: string; label: string; end?: boolean }[] = [
   { to: "/portfolio", label: "Portfolio" },
   { to: "/piezas", label: "Tienda" },
@@ -49,55 +52,60 @@ export function SiteFooter() {
       <div className="site-footer__surface">
         <div className="site-footer__inner">
           <div className="site-footer__body">
-            <nav className="site-footer__nav" aria-label="Secciones del sitio">
-              <p className="site-footer__label">Secciones</p>
-              <ul className="site-footer__nav-list">
-                {sections.map(({ to, label, end }) => (
-                  <li key={to}>
-                    <NavLink to={to} end={Boolean(end)}>
-                      <span aria-hidden="true">—</span>
-                      {label}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <blockquote className="site-footer__quote">
+              <p>{FOOTER_QUOTE}</p>
+            </blockquote>
 
-            <div className="site-footer__actions">
-              <div className="site-footer__actions-row">
-                <a
-                  className="site-footer__action-btn site-footer__action-btn--mail"
-                  href={`mailto:${CONTACT_EMAIL}`}
-                  aria-label={`Email — ${CONTACT_EMAIL}`}
-                >
-                  <MailIcon />
-                </a>
-                <a
-                  className="site-footer__action-btn site-footer__action-btn--ig"
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                >
-                  <InstagramIcon />
-                </a>
-                <NavLink
-                  className="site-footer__action-btn site-footer__action-btn--cta"
-                  to="/contacto"
-                >
-                  Ventana de contacto
-                </NavLink>
-              </div>
+            <div className="site-footer__aside">
+              <nav className="site-footer__nav" aria-label="Secciones del sitio">
+                <ul className="site-footer__nav-list">
+                  {sections.map(({ to, label, end }) => (
+                    <li key={to}>
+                      <NavLink to={to} end={Boolean(end)}>
+                        <span aria-hidden="true">—</span>
+                        {label}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
 
-              <div className="site-footer__top-row">
-                <button
-                  type="button"
-                  className="site-footer__action-btn site-footer__action-btn--top"
-                  onClick={scrollToTop}
-                  aria-label="Volver arriba"
-                >
-                  <ArrowUpIcon />
-                </button>
+              <div className="site-footer__actions">
+                <div className="site-footer__actions-row">
+                  <a
+                    className="site-footer__action-btn site-footer__action-btn--mail"
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    aria-label={`Email — ${CONTACT_EMAIL}`}
+                  >
+                    <MailIcon />
+                  </a>
+                  <a
+                    className="site-footer__action-btn site-footer__action-btn--ig"
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                  >
+                    <InstagramIcon />
+                  </a>
+                  <NavLink
+                    className="site-footer__action-btn site-footer__action-btn--cta"
+                    to="/contacto"
+                  >
+                    Ventana de contacto
+                  </NavLink>
+                </div>
+
+                <div className="site-footer__top-row">
+                  <button
+                    type="button"
+                    className="site-footer__action-btn site-footer__action-btn--top"
+                    onClick={scrollToTop}
+                    aria-label="Volver arriba"
+                  >
+                    <ArrowUpIcon />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
