@@ -12,7 +12,7 @@ export const NAV_ITEMS = [
 ] as const;
 
 /** Sustituir por el correo real de contacto. */
-export const CONTACT_EMAIL = "hola@dianavillabona.com";
+export const CONTACT_EMAIL = "villabonadiana2@gmail.com";
 
 export const INSTAGRAM_URL = "https://www.instagram.com/";
 
