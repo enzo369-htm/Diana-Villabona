@@ -1694,6 +1694,23 @@ a:hover {
   padding-top: 0.15rem;
 }
 
+/* HTML legacy en deploys cacheados */
+.site-footer__actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.site-footer__top-row {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 0.15rem;
+}
+
 .site-footer__actions-label {
   margin: 0;
   width: 100%;
@@ -1706,14 +1723,19 @@ a:hover {
   color: var(--ink-muted);
 }
 
-.site-footer__contact-link {
+.site-footer__contact-link,
+a.site-footer__action-btn.site-footer__action-btn--cta {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  min-width: 0;
+  min-height: 0;
   padding: 0.35rem 0;
   border: none;
-  border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-bottom: 1px solid rgba(20, 18, 16, 0.22);
+  border-radius: 0;
   background: transparent;
+  box-shadow: none;
   font-family: var(--sans);
   font-size: clamp(0.68rem, 0.85vw, 0.76rem);
   font-weight: 500;
@@ -1721,20 +1743,28 @@ a:hover {
   text-transform: uppercase;
   text-decoration: none;
   color: var(--ink);
+  cursor: pointer;
   transition:
     color 0.3s ease,
     border-color 0.3s ease,
     gap 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.site-footer__contact-link:hover {
+.site-footer__contact-link:hover,
+a.site-footer__action-btn.site-footer__action-btn--cta:hover,
+.site-footer__contact-link:focus-visible,
+a.site-footer__action-btn.site-footer__action-btn--cta:focus-visible {
   color: var(--accent);
   border-bottom-color: var(--accent);
   gap: 0.72rem;
   text-decoration: none;
+  transform: none;
+  box-shadow: none;
+  background: transparent;
 }
 
-.site-footer__contact-link:focus-visible {
+.site-footer__contact-link:focus-visible,
+a.site-footer__action-btn.site-footer__action-btn--cta:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
@@ -1756,26 +1786,34 @@ a:hover {
   gap: 0.5rem;
 }
 
-.site-footer__social-btn {
+.site-footer__social-btn,
+a.site-footer__action-btn.site-footer__action-btn--mail,
+a.site-footer__action-btn.site-footer__action-btn--ig {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 2.5rem;
   height: 2.5rem;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
   padding: 0;
-  border: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
+  border: 1px solid rgba(20, 18, 16, 0.14);
   border-radius: 50%;
-  background: color-mix(in srgb, var(--bg-elevated) 55%, transparent);
+  background: rgba(250, 248, 244, 0.72);
   color: var(--ink);
   text-decoration: none;
   cursor: pointer;
+  box-shadow: none;
+  transform: none;
   transition:
     color 0.25s ease,
     border-color 0.25s ease,
     background 0.25s ease;
 }
 
-.site-footer__social-btn svg {
+.site-footer__social-btn svg,
+a.site-footer__action-btn.site-footer__action-btn--mail svg,
+a.site-footer__action-btn.site-footer__action-btn--ig svg {
   width: 1.1rem;
   height: 1.1rem;
   flex-shrink: 0;
@@ -1786,27 +1824,37 @@ a:hover {
   stroke-linejoin: round;
 }
 
-.site-footer__social-btn .site-footer__ig-dot {
+.site-footer__social-btn .site-footer__ig-dot,
+a.site-footer__action-btn--ig .site-footer__ig-dot {
   fill: currentColor;
   stroke: none;
 }
 
 .site-footer__social-btn:hover,
-.site-footer__social-btn:focus-visible {
+.site-footer__social-btn:focus-visible,
+a.site-footer__action-btn.site-footer__action-btn--mail:hover,
+a.site-footer__action-btn.site-footer__action-btn--mail:focus-visible,
+a.site-footer__action-btn.site-footer__action-btn--ig:hover,
+a.site-footer__action-btn.site-footer__action-btn--ig:focus-visible {
   color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
-  background: color-mix(in srgb, var(--bg-elevated) 80%, #fff);
+  border-color: rgba(122, 47, 31, 0.45);
+  background: rgba(255, 255, 255, 0.88);
   text-decoration: none;
+  transform: none;
+  box-shadow: none;
 }
 
-.site-footer__top-link {
+.site-footer__top-link,
+button.site-footer__action-btn.site-footer__action-btn--top {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  margin-top: 0.35rem;
+  margin: 0.35rem 0 0;
   padding: 0.25rem 0;
   border: none;
+  border-radius: 0;
   background: transparent;
+  box-shadow: none;
   font-family: var(--sans);
   font-size: 0.72rem;
   font-weight: 500;
@@ -1814,10 +1862,13 @@ a:hover {
   text-transform: uppercase;
   color: var(--ink-muted);
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
   transition: color 0.25s ease, gap 0.3s ease;
 }
 
-.site-footer__top-link svg {
+.site-footer__top-link svg,
+button.site-footer__action-btn.site-footer__action-btn--top svg {
   width: 0.95rem;
   height: 0.95rem;
   fill: none;
@@ -1829,17 +1880,26 @@ a:hover {
 }
 
 .site-footer__top-link:hover,
-.site-footer__top-link:focus-visible {
+.site-footer__top-link:focus-visible,
+button.site-footer__action-btn.site-footer__action-btn--top:hover,
+button.site-footer__action-btn.site-footer__action-btn--top:focus-visible {
   color: var(--accent);
   gap: 0.55rem;
+  background: transparent;
+  border: none;
+  transform: none;
+  box-shadow: none;
 }
 
 .site-footer__top-link:hover svg,
-.site-footer__top-link:focus-visible svg {
+.site-footer__top-link:focus-visible svg,
+button.site-footer__action-btn.site-footer__action-btn--top:hover svg,
+button.site-footer__action-btn.site-footer__action-btn--top:focus-visible svg {
   transform: translateY(-0.15rem);
 }
 
-.site-footer__top-link:focus-visible {
+.site-footer__top-link:focus-visible,
+button.site-footer__action-btn.site-footer__action-btn--top:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
