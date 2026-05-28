@@ -41,7 +41,7 @@ export function TalleresIntro() {
       <div className="talleres-intro__shade" aria-hidden />
       <div className="talleres-intro__caption">
         <h1 id="talleres-intro-title" className="section-title talleres-intro__title">
-          Talleres
+          Encuentros
         </h1>
       </div>
     </section>

@@ -48,7 +48,7 @@ export function PortfolioCorridor() {
   if (bands.length === 0) {
     return (
       <p className="portfolio-corridor__empty page-content page-content--pad">
-        Aún no hay obras en el portfolio.
+        Aún no hay obras en el portafolio.
       </p>
     );
   }

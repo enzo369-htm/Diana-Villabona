@@ -156,7 +156,7 @@ export function AdminPortfolioTab({
               />
             </label>
             <div className="admin-field">
-              <span className="admin-field__label-text">6 fotos del portfolio</span>
+              <span className="admin-field__label-text">6 fotos del portafolio</span>
               <p className="admin-field__help">
                 Fila superior: fotos 1–3. Fila inferior: 4–6. La foto 1 es la que
                 aparece en el mosaico.

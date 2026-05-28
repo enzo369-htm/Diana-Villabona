@@ -9,7 +9,7 @@ export function BitacoraPage() {
   return (
     <div className="page-content page-content--pad page-content--bitacora">
       <header className="page-header page-header--blog">
-        <h1 className="section-title">Blog</h1>
+        <h1 className="section-title">Bitácora</h1>
       </header>
 
       <ul className="bita-feed bita-feed--aligned" role="list">

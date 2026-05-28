@@ -22,12 +22,13 @@ export function HomeVitrina() {
           <p id="home-vitrina-title" className="section-title home-band__eyebrow">
             Tienda
           </p>
-        </header>
-        <div className="home-vitrina__actions">
-          <Link to="/piezas" className="btn-pill btn-pill--ghost">
+          <Link to="/piezas" className="home-vitrina__catalog-link">
             Ver catálogo
+            <span className="home-vitrina__catalog-link-arrow" aria-hidden>
+              →
+            </span>
           </Link>
-        </div>
+        </header>
       </section>
     );
   }
@@ -42,18 +43,18 @@ export function HomeVitrina() {
         <p id="home-vitrina-title" className="section-title home-band__eyebrow">
           Tienda
         </p>
+        <Link to="/piezas" className="home-vitrina__catalog-link">
+          Ver catálogo completo
+          <span className="home-vitrina__catalog-link-arrow" aria-hidden>
+            →
+          </span>
+        </Link>
       </header>
 
       <div className="home-vitrina__grid">
         {destacadas.map((p, index) => (
           <VitrinaCard key={p.id} pieza={p} index={index} />
         ))}
-      </div>
-
-      <div className="home-vitrina__actions">
-        <Link to="/piezas" className="btn-pill btn-pill--ghost">
-          Ver catálogo completo
-        </Link>
       </div>
     </section>
   );

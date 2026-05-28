@@ -30,7 +30,7 @@ export function TalleresPage() {
           </p>
         </header>
 
-        <section className="talleres-section" aria-label="Talleres">
+        <section className="talleres-section" aria-label="Encuentros">
           {grilla.length === 0 ? (
             <p>Pronto publicaremos nuevas fechas.</p>
           ) : (

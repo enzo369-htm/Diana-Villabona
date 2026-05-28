@@ -1,5 +1,6 @@
 import { homeConfig } from "./seed";
 import type { ObraPortfolio, Pieza, Post } from "../types/content";
+import { TECNICAS_PIEZA } from "../types/content";
 import type { PortfolioMosaicCell } from "./portfolioImages";
 
 export function getPiezaById(piezas: Pieza[], id: string): Pieza | undefined {
@@ -23,15 +24,7 @@ export function getPostDestacado(posts: Post[]): Post | undefined {
   );
 }
 
-export const tecnicasDisponibles = [
-  "Todas",
-  "Raku",
-  "Saggar",
-  "Obvara",
-  "Esmaltes",
-  "Modelado",
-  "Otro",
-] as const;
+export const tecnicasDisponibles = ["Todas", ...TECNICAS_PIEZA] as const;
 
 export type FiltroTecnica = (typeof tecnicasDisponibles)[number];
 

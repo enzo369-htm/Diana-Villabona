@@ -24,16 +24,32 @@ export function HomeCeramicaIntro() {
     <section className="ceramica-swiss" id="ceramica" aria-labelledby="ceramica-titulo">
       <div className="ceramica-swiss__split">
         <div className="ceramica-swiss__text">
-          <blockquote
-            className="ceramica-swiss__quote ceramica-swiss__quote--longform ceramica-swiss__quote--feature"
-            id="ceramica-titulo"
-          >
-            <p className="ceramica-swiss__quote-text">
-              Me acerco a la Tierra con curiosidad. Dejo que me enseñe porque se que si guardo silencio aprendo a observar.
+          <blockquote className="ceramica-swiss__poem" id="ceramica-titulo">
+            <p className="ceramica-swiss__poem-mark" aria-hidden>
+              ◦
             </p>
-            <p className="ceramica-swiss__quote-text">
-              Me detengo y escarbo, y entre más profundo llego, voy entiendiendo que también soy ella.
-            </p>
+            <div className="ceramica-swiss__poem-stanza">
+              <p className="ceramica-swiss__poem-line">
+                Me acerco a la Tierra con curiosidad.
+              </p>
+              <p className="ceramica-swiss__poem-line">
+                Dejo que me enseñe porque se que
+              </p>
+              <p className="ceramica-swiss__poem-line">
+                si guardo silencio aprendo a observar.
+              </p>
+            </div>
+            <div className="ceramica-swiss__poem-stanza">
+              <p className="ceramica-swiss__poem-line">
+                Me detengo y escarbo,
+              </p>
+              <p className="ceramica-swiss__poem-line">
+                y entre más profundo llego,
+              </p>
+              <p className="ceramica-swiss__poem-line">
+                voy entiendiendo que también soy ella.
+              </p>
+            </div>
           </blockquote>
         </div>
         <div className="ceramica-swiss__video-wrap">

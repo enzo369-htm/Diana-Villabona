@@ -3,6 +3,14 @@ export const WHATSAPP_PHONE = "573001234567";
 
 export const SITE_NAME = "Diana Villabona";
 
+export const NAV_ITEMS = [
+  { to: "/portfolio", label: "Portafolio" },
+  { to: "/piezas", label: "Tienda" },
+  { to: "/bitacora", label: "Bitácora" },
+  { to: "/talleres", label: "Encuentros" },
+  { to: "/sobre-mi", label: "Acerca" },
+] as const;
+
 /** Sustituir por el correo real de contacto. */
 export const CONTACT_EMAIL = "hola@dianavillabona.com";
 

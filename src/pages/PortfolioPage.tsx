@@ -5,7 +5,7 @@ export function PortfolioPage() {
     <section
       className="portfolio-page"
       id="portfolio"
-      aria-label="Portfolio"
+      aria-label="Portafolio"
     >
       <PortfolioCorridor />
     </section>

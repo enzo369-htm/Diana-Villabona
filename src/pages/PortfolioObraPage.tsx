@@ -12,7 +12,7 @@ export function PortfolioObraPage() {
     return (
       <div className="page-content page-content--pad">
         <p>No encontramos esta obra.</p>
-        <Link to="/portfolio">Volver al portfolio</Link>
+        <Link to="/portfolio">Volver al portafolio</Link>
       </div>
     );
   }
@@ -25,7 +25,7 @@ export function PortfolioObraPage() {
   return (
     <article className="page-content page-content--pad portfolio-obra">
       <nav className="breadcrumb" aria-label="Migas">
-        <Link to="/portfolio">Portfolio</Link>
+        <Link to="/portfolio">Portafolio</Link>
         <span aria-hidden> / </span>
         <span>{obra.titulo}</span>
       </nav>

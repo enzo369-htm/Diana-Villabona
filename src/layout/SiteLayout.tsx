@@ -1,20 +1,14 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SiteFooter } from "../components/SiteFooter";
-import { SITE_NAME } from "../siteConfig";
+import { NAV_ITEMS, SITE_NAME } from "../siteConfig";
 
 const SCROLL_DELTA = 8;
 const SCROLL_MIN_TO_HIDE = 72;
 /** En home: solo arriba del todo el nav flota sobre el hero (sin barra). */
 const HERO_FLOAT_MAX = 40;
 
-const nav: { to: string; label: string; end?: boolean }[] = [
-  { to: "/portfolio", label: "Portfolio" },
-  { to: "/piezas", label: "Tienda" },
-  { to: "/bitacora", label: "Blog" },
-  { to: "/talleres", label: "Talleres" },
-  { to: "/sobre-mi", label: "Sobre mí" },
-];
+const nav = NAV_ITEMS;
 
 export function SiteLayout() {
   const { pathname, hash } = useLocation();
@@ -94,11 +88,10 @@ export function SiteLayout() {
             </NavLink>
             <nav className="site-nav" aria-label="Principal">
               <ul className="site-nav__list">
-                {nav.map(({ to, label, end }) => (
+                {nav.map(({ to, label }) => (
                   <li key={to}>
                     <NavLink
                       to={to}
-                      end={Boolean(end)}
                       className={({ isActive }) =>
                         isActive ? "site-nav__link is-active" : "site-nav__link"
                       }

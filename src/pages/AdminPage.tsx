@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useCallback, useRef, useState } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
-import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
+import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
 import { useContent } from "../context/ContentContext";
 import {
   normalizeStoredObraPortfolio,
@@ -12,14 +12,7 @@ import {
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
 import { AdminTalleresTab } from "./AdminTalleresTab";
 
-const TECNICAS: TecnicaPieza[] = [
-  "Raku",
-  "Saggar",
-  "Obvara",
-  "Esmaltes",
-  "Modelado",
-  "Otro",
-];
+const TECNICAS: TecnicaPieza[] = [...TECNICAS_PIEZA];
 
 function newEmptyPieza(): Pieza {
   return {
@@ -27,7 +20,7 @@ function newEmptyPieza(): Pieza {
     titulo: "",
     descripcion: "",
     dimensiones: "",
-    tecnica: "Raku",
+    tecnica: "Objetos",
     imagenes: [],
     destacadaHome: false,
     disponible: true,
@@ -192,7 +185,7 @@ export function AdminPage() {
   }, [obraDraft, obrasPortfolio, setObrasPortfolio]);
 
   const deleteObra = useCallback(() => {
-    if (!obraDraft || !window.confirm("¿Eliminar esta obra del portfolio?")) return;
+    if (!obraDraft || !window.confirm("¿Eliminar esta obra del portafolio?")) return;
     setObrasPortfolio(obrasPortfolio.filter((o) => o.id !== obraDraft.id));
     setObraDraft(null);
   }, [obraDraft, obrasPortfolio, setObrasPortfolio]);
@@ -284,7 +277,7 @@ export function AdminPage() {
       <header className="page-header">
         <h1>Administración</h1>
         <p className="page-header__lede">
-          Edición del catálogo, portfolio, talleres y bitácora. Los cambios se guardan en
+          Edición del catálogo, portafolio, encuentros y bitácora. Los cambios se guardan en
           este navegador (localStorage). Las imágenes se eligen desde tu equipo.
         </p>
       </header>
@@ -340,7 +333,7 @@ export function AdminPage() {
           className={tab === "portfolio" ? "admin-tab admin-tab--on" : "admin-tab"}
           onClick={() => setTab("portfolio")}
         >
-          Portfolio
+          Portafolio
         </button>
         <button
           type="button"
@@ -349,7 +342,7 @@ export function AdminPage() {
           className={tab === "talleres" ? "admin-tab admin-tab--on" : "admin-tab"}
           onClick={() => setTab("talleres")}
         >
-          Talleres
+          Encuentros
         </button>
         <button
           type="button"
@@ -437,7 +430,7 @@ export function AdminPage() {
                   />
                 </label>
                 <label className="admin-field">
-                  Técnica
+                  Sección
                   <select
                     value={piezaDraft.tecnica}
                     onChange={(e) =>

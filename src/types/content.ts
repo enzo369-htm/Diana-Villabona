@@ -1,10 +1,6 @@
-export type TecnicaPieza =
-  | "Raku"
-  | "Saggar"
-  | "Obvara"
-  | "Esmaltes"
-  | "Modelado"
-  | "Otro";
+export const TECNICAS_PIEZA = ["Objetos", "Ambiente", "Escultura"] as const;
+
+export type TecnicaPieza = (typeof TECNICAS_PIEZA)[number];
 
 export interface Pieza {
   id: string;

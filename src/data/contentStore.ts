@@ -1,5 +1,5 @@
-import type { ObraPortfolio, Pieza, Post, Taller } from "../types/content";
-import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
+import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
+import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
 
 const STORAGE_KEY = "dvc-cms-catalogo-v1";
 
@@ -134,18 +134,65 @@ export function clearCms(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
 
+const LEGACY_TECNICA_MAP: Record<string, TecnicaPieza> = {
+  Raku: "Escultura",
+  Saggar: "Objetos",
+  Obvara: "Objetos",
+  Esmaltes: "Ambiente",
+  Modelado: "Escultura",
+  Otro: "Objetos",
+};
+
+export function normalizeTecnicaPieza(raw: unknown): TecnicaPieza {
+  if (
+    typeof raw === "string" &&
+    (TECNICAS_PIEZA as readonly string[]).includes(raw)
+  ) {
+    return raw as TecnicaPieza;
+  }
+  if (typeof raw === "string" && raw in LEGACY_TECNICA_MAP) {
+    return LEGACY_TECNICA_MAP[raw]!;
+  }
+  return "Objetos";
+}
+
+function normalizeStoredPieza(raw: unknown): Pieza {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  const id =
+    typeof o.id === "string" && o.id.length > 0 ? o.id : `p-${Date.now()}`;
+  return {
+    id,
+    titulo: typeof o.titulo === "string" ? o.titulo : "",
+    descripcion: typeof o.descripcion === "string" ? o.descripcion : "",
+    dimensiones: typeof o.dimensiones === "string" ? o.dimensiones : "",
+    tecnica: normalizeTecnicaPieza(o.tecnica),
+    imagenes: Array.isArray(o.imagenes)
+      ? o.imagenes.filter((x): x is string => typeof x === "string")
+      : [],
+    destacadaHome: Boolean(o.destacadaHome),
+    disponible: o.disponible !== false,
+    historia: typeof o.historia === "string" ? o.historia : undefined,
+  };
+}
+
 /** El seed es la base; el CMS puede editar existentes y añadir piezas nuevas. */
 export function mergePiezasWithSeed(stored: Pieza[] | null, seed: Pieza[]): Pieza[] {
   if (!stored) return seed;
-  const storedById = new Map(stored.map((p) => [p.id, p]));
+  const storedById = new Map(
+    stored.map((p) => [p.id, normalizeStoredPieza(p)])
+  );
   const seedIds = new Set(seed.map((s) => s.id));
 
   const merged = seed.map((s) => {
     const override = storedById.get(s.id);
-    return override ? { ...s, ...override, id: s.id } : s;
+    return override
+      ? normalizeStoredPieza({ ...s, ...override, id: s.id })
+      : s;
   });
 
-  const extras = stored.filter((p) => p.id && !seedIds.has(p.id));
+  const extras = stored
+    .filter((p) => p.id && !seedIds.has(p.id))
+    .map(normalizeStoredPieza);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }
 

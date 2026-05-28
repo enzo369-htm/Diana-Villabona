@@ -26,7 +26,7 @@ export function PiezasPage() {
         </p>
       </header>
 
-      <div className="piezas-filters" role="group" aria-label="Filtrar por técnica">
+      <div className="piezas-filters" role="group" aria-label="Filtrar por sección">
         {tecnicasDisponibles.map((t) => (
           <button
             key={t}
@@ -43,7 +43,7 @@ export function PiezasPage() {
 
       {lista.length === 0 ? (
         <p className="piezas-catalog__empty">
-          No hay piezas con esa técnica. Probá otro filtro.
+          No hay piezas en esta sección. Probá otro filtro.
         </p>
       ) : (
         <div className="home-vitrina__grid piezas-catalog__grid" role="list">

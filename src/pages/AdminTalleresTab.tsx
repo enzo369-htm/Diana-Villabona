@@ -37,7 +37,7 @@ export function AdminTalleresTab({
     <div className="admin-split">
       <aside className="admin-list-panel">
         <div className="admin-list-head">
-          <h2 className="admin-h2">Talleres ({talleres.length})</h2>
+          <h2 className="admin-h2">Encuentros ({talleres.length})</h2>
           <button
             type="button"
             className="admin-btn"

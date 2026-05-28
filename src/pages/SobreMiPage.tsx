@@ -4,7 +4,7 @@ export function SobreMiPage() {
   return (
     <div className="page-content page-content--pad sobre-mi">
       <header className="page-header">
-        <h1>Sobre mí</h1>
+        <h1>Acerca</h1>
         <p className="page-header__lede">
           Trayectoria, filosofía y visión artística: el contexto detrás del
           taller y de cada pieza.
