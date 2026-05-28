@@ -58,5 +58,5 @@ export function pickRandomUnique(srcs: readonly string[], n: number): string[] {
 /** Vídeo en /public (symlink o copia; p. ej. viideo.mp4) */
 export const VIIDEO = "/viideo.mp4" as const;
 
-/** Intro de la sección Talleres */
-export const VIDEO_TALLERES = "/videotalleres.mp4" as const;
+/** Hero vídeo de la sección Encuentros (Talleres) — MP4 para navegadores web */
+export const VIDEO_TALLERES = "/videoheroseccionencuentros.mp4" as const;
