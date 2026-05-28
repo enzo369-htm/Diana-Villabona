@@ -1,5 +1,5 @@
-/** Sustituir por el número en formato internacional sin + (p. ej. 573104567890). */
-export const WHATSAPP_PHONE = "573001234567";
+/** Número en formato internacional sin + (Colombia: 57 + celular). */
+export const WHATSAPP_PHONE = "573112706016";
 
 export const SITE_NAME = "Diana Villabona";
 

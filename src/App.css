@@ -1617,16 +1617,39 @@ a:hover {
 .site-footer__body {
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) auto auto;
+  grid-template-rows: auto auto;
   gap: clamp(2.5rem, 6vw, 5rem);
   align-items: start;
   margin-bottom: clamp(1.5rem, 3vw, 2rem);
 }
 
+.site-footer__row {
+  display: contents;
+}
+
 .site-footer__quote {
+  grid-column: 1;
+  grid-row: 1 / span 2;
   margin: 0;
   padding: 0;
   border: none;
   max-width: 28rem;
+}
+
+.site-footer__nav {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.site-footer__actions {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.site-footer__top-link {
+  grid-column: 3;
+  grid-row: 2;
+  align-self: start;
 }
 
 .site-footer__quote p {
@@ -1640,9 +1663,6 @@ a:hover {
   color: color-mix(in srgb, var(--accent) 22%, var(--ink));
 }
 
-.site-footer__nav {
-  align-self: start;
-}
 
 .site-footer__label {
   margin: 0 0 1.1rem;

@@ -56,54 +56,61 @@ export function SiteFooter() {
               <p>{FOOTER_QUOTE}</p>
             </blockquote>
 
-            <nav className="site-footer__nav" aria-label="Secciones del sitio">
-              <ul className="site-footer__nav-list">
-                {sections.map(({ to, label }) => (
-                  <li key={to}>
-                    <NavLink to={to}>
-                      <span aria-hidden="true">—</span>
-                      {label}
-                    </NavLink>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+            <div className="site-footer__row">
+              <nav className="site-footer__nav" aria-label="Secciones del sitio">
+                <ul className="site-footer__nav-list">
+                  {sections.map(({ to, label }) => (
+                    <li key={to}>
+                      <NavLink to={to}>
+                        <span aria-hidden="true">—</span>
+                        {label}
+                      </NavLink>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
 
-            <div className="site-footer__actions">
-              <p className="site-footer__actions-label">Contacto</p>
-              <NavLink to="/contacto" className="site-footer__contact-link">
-                Ventana de contacto
-                <span className="site-footer__contact-link-arrow" aria-hidden>
-                  →
-                </span>
-              </NavLink>
-              <div className="site-footer__social" role="group" aria-label="Redes y correo">
-                <a
-                  className="site-footer__social-btn"
-                  href={`mailto:${CONTACT_EMAIL}`}
-                  aria-label={`Email — ${CONTACT_EMAIL}`}
+              <div className="site-footer__actions">
+                <p className="site-footer__actions-label">Contacto</p>
+                <NavLink to="/contacto" className="site-footer__contact-link">
+                  Ventana de contacto
+                  <span className="site-footer__contact-link-arrow" aria-hidden>
+                    →
+                  </span>
+                </NavLink>
+                <div
+                  className="site-footer__social"
+                  role="group"
+                  aria-label="Redes y correo"
                 >
-                  <MailIcon />
-                </a>
-                <a
-                  className="site-footer__social-btn"
-                  href={INSTAGRAM_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                >
-                  <InstagramIcon />
-                </a>
+                  <a
+                    className="site-footer__social-btn"
+                    href={`mailto:${CONTACT_EMAIL}`}
+                    aria-label={`Email — ${CONTACT_EMAIL}`}
+                  >
+                    <MailIcon />
+                  </a>
+                  <a
+                    className="site-footer__social-btn"
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram"
+                  >
+                    <InstagramIcon />
+                  </a>
+                </div>
               </div>
-              <button
-                type="button"
-                className="site-footer__top-link"
-                onClick={scrollToTop}
-              >
-                <span>Subir</span>
-                <ArrowUpIcon />
-              </button>
             </div>
+
+            <button
+              type="button"
+              className="site-footer__top-link"
+              onClick={scrollToTop}
+            >
+              <span>Subir</span>
+              <ArrowUpIcon />
+            </button>
           </div>
 
           <div className="site-footer__credit-row">
