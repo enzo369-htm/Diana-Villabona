@@ -5,10 +5,6 @@ export function SobreMiPage() {
     <div className="page-content page-content--pad sobre-mi">
       <header className="page-header">
         <h1>Acerca</h1>
-        <p className="page-header__lede">
-          Trayectoria, filosofía y visión artística: el contexto detrás del
-          taller y de cada pieza.
-        </p>
       </header>
 
       <div className="sobre-mi__split">
@@ -23,11 +19,6 @@ export function SobreMiPage() {
           />
         </div>
         <div className="sobre-mi__text">
-          <h2>Trayectoria</h2>
-          <p>texto</p>
-          <h2>Filosofía</h2>
-          <p>texto</p>
-          <h2>Visión</h2>
           <p>texto</p>
         </div>
       </div>
