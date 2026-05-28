@@ -5,8 +5,8 @@ import { NAV_ITEMS, SITE_NAME } from "../siteConfig";
 
 const SCROLL_DELTA = 8;
 const SCROLL_MIN_TO_HIDE = 72;
-/** En home: solo arriba del todo el nav flota sobre el hero (sin barra). */
-const HERO_FLOAT_MAX = 40;
+/** En home: nav flotante solo en el tope absoluto del hero. */
+const HOME_HERO_NAV_TOP = 8;
 
 const nav = NAV_ITEMS;
 
@@ -18,7 +18,12 @@ export function SiteLayout() {
   const lastScrollY = useRef(0);
 
   const isHeroFloatNav =
-    isHome && !headerHidden && scrollY <= HERO_FLOAT_MAX;
+    isHome && !headerHidden && scrollY <= HOME_HERO_NAV_TOP;
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("is-home", isHome);
+    return () => document.documentElement.classList.remove("is-home");
+  }, [isHome]);
 
   useLayoutEffect(() => {
     setHeaderHidden(false);
@@ -48,7 +53,15 @@ export function SiteLayout() {
 
         setScrollY(y);
 
-        if (y <= 0) {
+        if (isHome) {
+          if (y <= 0) {
+            setHeaderHidden(false);
+          } else if (delta > SCROLL_DELTA) {
+            setHeaderHidden(true);
+          } else if (delta < -SCROLL_DELTA) {
+            setHeaderHidden(false);
+          }
+        } else if (y <= 0) {
           setHeaderHidden(false);
         } else if (delta > SCROLL_DELTA && y > SCROLL_MIN_TO_HIDE) {
           setHeaderHidden(true);
@@ -63,7 +76,7 @@ export function SiteLayout() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [pathname]);
+  }, [pathname, isHome]);
 
   return (
     <div className="app">

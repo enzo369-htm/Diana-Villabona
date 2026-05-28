@@ -1,5 +1,11 @@
 import { NavLink } from "react-router-dom";
-import { CONTACT_EMAIL, INSTAGRAM_URL, NAV_ITEMS } from "../siteConfig";
+import {
+  CONTACT_EMAIL,
+  DEVELOPER_NAME,
+  DEVELOPER_PORTFOLIO_URL,
+  INSTAGRAM_URL,
+  NAV_ITEMS,
+} from "../siteConfig";
 
 const FOOTER_QUOTE =
   "Lo más hermoso y profundo de la cerámica es dejarse usar como medio para que la naturaleza se exprese a sí misma.";
@@ -100,9 +106,19 @@ export function SiteFooter() {
             </div>
           </div>
 
-          <p className="site-footer__credit">
-            © {year} Diana Villabona · Cerámica y procesos
-          </p>
+          <div className="site-footer__credit-row">
+            <p className="site-footer__credit">
+              © {year} Diana Villabona · Cerámica y procesos
+            </p>
+            <a
+              className="site-footer__developer"
+              href={DEVELOPER_PORTFOLIO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Desarrollado por {DEVELOPER_NAME}
+            </a>
+          </div>
         </div>
       </div>
     </footer>

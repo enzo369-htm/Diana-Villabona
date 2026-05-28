@@ -33,6 +33,11 @@ html {
   background: var(--bg);
 }
 
+/* Home: secciones a pantalla completa; sin offset de header en el snap */
+html.is-home {
+  scroll-padding-top: 0;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -285,7 +290,6 @@ a:hover {
   padding: 0;
   overflow: hidden;
   scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 .hero__image-wrap {
@@ -926,7 +930,6 @@ a:hover {
   overflow: hidden;
   font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 .ceramica-swiss__split {
@@ -1919,14 +1922,57 @@ button.site-footer__action-btn.site-footer__action-btn--top:focus-visible {
   }
 }
 
-.site-footer__credit {
-  margin: 0;
+.site-footer__credit-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 1.5rem;
+  flex-wrap: wrap;
   padding-top: clamp(1.25rem, 2.5vw, 1.75rem);
   border-top: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
+}
+
+.site-footer__credit {
+  margin: 0;
   font-size: 0.76rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--ink-muted);
+}
+
+.site-footer__developer {
+  margin: 0;
+  margin-left: auto;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  text-decoration: none;
+  text-align: right;
+  transition: color 0.2s ease;
+}
+
+.site-footer__developer:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.site-footer__developer:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .site-footer__credit-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-footer__developer {
+    margin-left: 0;
+    text-align: left;
+  }
 }
 
 /* Legacy footer / newsletter */
