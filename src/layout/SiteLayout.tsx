@@ -14,6 +14,7 @@ export function SiteLayout() {
   const { pathname, hash } = useLocation();
   const isHome = pathname === "/";
   const [headerHidden, setHeaderHidden] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
   const lastScrollY = useRef(0);
 
@@ -25,7 +26,13 @@ export function SiteLayout() {
     return () => document.documentElement.classList.remove("is-home");
   }, [isHome]);
 
+  useEffect(() => {
+    document.documentElement.classList.toggle("nav-open", mobileNavOpen);
+    return () => document.documentElement.classList.remove("nav-open");
+  }, [mobileNavOpen]);
+
   useLayoutEffect(() => {
+    setMobileNavOpen(false);
     setHeaderHidden(false);
     setScrollY(0);
     lastScrollY.current = 0;
@@ -78,6 +85,21 @@ export function SiteLayout() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname, isHome]);
 
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileNavOpen]);
+
+  useEffect(() => {
+    if (headerHidden) setMobileNavOpen(false);
+  }, [headerHidden]);
+
+  const closeMobileNav = () => setMobileNavOpen(false);
+
   return (
     <div className="app">
       <div className="app__surface">
@@ -96,10 +118,40 @@ export function SiteLayout() {
               to="/"
               end
               aria-label={`Inicio — ${SITE_NAME}`}
+              onClick={closeMobileNav}
             >
               <span className="site-top__brand-text">{SITE_NAME}</span>
             </NavLink>
-            <nav className="site-nav" aria-label="Principal">
+            <button
+              type="button"
+              className="site-nav-toggle"
+              aria-expanded={mobileNavOpen}
+              aria-controls="site-nav-panel"
+              onClick={() => setMobileNavOpen((open) => !open)}
+            >
+              <span className="site-nav-toggle__icon" aria-hidden="true" />
+              <span className="site-nav-toggle__label">
+                {mobileNavOpen ? "Cerrar" : "Menú"}
+              </span>
+            </button>
+            {mobileNavOpen ? (
+              <button
+                type="button"
+                className="site-nav-backdrop"
+                aria-label="Cerrar menú"
+                onClick={closeMobileNav}
+              />
+            ) : null}
+            <nav
+              id="site-nav-panel"
+              className={[
+                "site-nav",
+                mobileNavOpen ? "site-nav--open" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-label="Principal"
+            >
               <ul className="site-nav__list">
                 {nav.map(({ to, label }) => (
                   <li key={to}>
@@ -108,6 +160,7 @@ export function SiteLayout() {
                       className={({ isActive }) =>
                         isActive ? "site-nav__link is-active" : "site-nav__link"
                       }
+                      onClick={closeMobileNav}
                     >
                       {label}
                     </NavLink>

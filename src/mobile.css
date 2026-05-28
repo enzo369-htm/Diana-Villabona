@@ -1,0 +1,408 @@
+/**
+ * Estilos solo para móvil (max-width: 767px).
+ * El escritorio no se modifica aquí.
+ */
+@media (max-width: 767px) {
+  :root {
+    --site-header-h: 3rem;
+    --site-nav-pad-x: 1rem;
+  }
+
+  html {
+    scroll-snap-type: none;
+  }
+
+  html.is-home {
+    scroll-behavior: auto;
+  }
+
+  html.nav-open {
+    overflow: hidden;
+  }
+
+  html.nav-open body {
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  body {
+    overflow-x: clip;
+  }
+
+  /* —— Nav: menú desplegable —— */
+  .site-nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 0.35rem 0.15rem;
+    border: none;
+    background: transparent;
+    font-family: var(--sans);
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    cursor: pointer;
+  }
+
+  .site-nav-toggle__icon {
+    display: block;
+    width: 1.15rem;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    box-shadow:
+      0 -5px 0 currentColor,
+      0 5px 0 currentColor;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.2s ease,
+      background 0.2s ease;
+  }
+
+  .site-nav-toggle[aria-expanded="true"] .site-nav-toggle__icon {
+    box-shadow: none;
+    transform: rotate(45deg);
+  }
+
+  .site-nav-toggle[aria-expanded="true"] .site-nav-toggle__icon::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1.15rem;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transform: rotate(-90deg);
+  }
+
+  .site-nav-toggle__icon {
+    position: relative;
+  }
+
+  .site-nav-toggle:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .site-top--hero .site-nav-toggle {
+    color: var(--accent);
+  }
+
+  .site-top__bar {
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .site-top--hero .site-top__bar {
+    padding: 0.7rem 1rem;
+    align-items: center;
+  }
+
+  .site-top__brand-text {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    line-height: 1.3;
+  }
+
+  .site-nav {
+    position: static;
+    flex: 0 0 auto;
+  }
+
+  .site-nav-backdrop {
+    position: fixed;
+    inset: var(--site-header-h, 3rem) 0 0;
+    z-index: 18;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: rgba(20, 18, 16, 0.35);
+    cursor: pointer;
+  }
+
+  .site-nav__list {
+    position: fixed;
+    top: var(--site-header-h, 3rem);
+    left: 0;
+    right: 0;
+    z-index: 19;
+    flex-direction: column;
+    align-items: stretch;
+    max-height: min(70dvh, calc(100dvh - var(--site-header-h, 3rem)));
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 0;
+    padding: 0.35rem 0 0.75rem;
+    background: rgba(248, 245, 240, 0.98);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
+    box-shadow: 0 14px 32px rgba(20, 18, 16, 0.1);
+    transform: translateY(-108%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.25s ease,
+      visibility 0.32s;
+  }
+
+  .site-nav--open .site-nav__list {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .site-top--hero .site-nav__list {
+    background: rgba(248, 245, 240, 0.98);
+  }
+
+  .site-nav__link {
+    width: 100%;
+    min-height: 2.85rem;
+    height: auto;
+    padding: 0.75rem var(--site-nav-pad-x);
+    border-left: none;
+    border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    justify-content: flex-start;
+    box-shadow: none;
+  }
+
+  .site-nav__list li:first-child .site-nav__link {
+    border-top: none;
+  }
+
+  .site-top--hero .site-nav__link {
+    padding: 0.75rem var(--site-nav-pad-x);
+    border-top: 1px solid color-mix(in srgb, var(--line) 65%, transparent);
+  }
+
+  .site-top--hero .site-nav__list li:first-child .site-nav__link {
+    border-top: none;
+  }
+
+  .site-nav__link.is-active {
+    background: color-mix(in srgb, var(--accent-soft) 18%, var(--bg));
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+
+  .site-top--hero .site-nav__link.is-active {
+    text-decoration: none;
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+
+  /* —— Home: hero y secciones pantalla completa —— */
+  .hero {
+    min-height: 100svh;
+    height: 100svh;
+    max-height: 100svh;
+  }
+
+  .hero__split {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+
+  .ceramica-swiss {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .ceramica-swiss__split {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+  }
+
+  .ceramica-swiss__text {
+    order: 1;
+    flex: none;
+    padding: clamp(1.5rem, 5vw, 2rem) 1rem;
+  }
+
+  .ceramica-swiss__video-wrap {
+    order: 2;
+    flex: none;
+    width: 100%;
+    min-height: min(52svh, 420px);
+    height: min(52svh, 420px);
+  }
+
+  .ceramica-swiss__poem {
+    max-width: none;
+    padding-left: 1rem;
+  }
+
+  .ceramica-swiss__poem-line {
+    font-size: clamp(1.05rem, 4.2vw, 1.28rem);
+    line-height: 1.62;
+  }
+
+  .home-vitrina.home-band:has(.home-vitrina__grid) {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+    padding-top: calc(var(--site-header-h, 3rem) + 0.85rem);
+    padding-bottom: 1.75rem;
+    --home-band-pad-x: 1rem;
+  }
+
+  .home-vitrina__head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .home-vitrina__catalog-link {
+    margin-left: 0;
+  }
+
+  .home-vitrina__grid,
+  .piezas-catalog__grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-rows: minmax(240px, 46svh);
+    gap: 10px;
+  }
+
+  .home-vitrina__card h3 {
+    font-size: clamp(1rem, 4vw, 1.2rem);
+  }
+
+  .home-vitrina__tag,
+  .home-vitrina__cta {
+    font-size: 0.62rem;
+  }
+
+  .home-band {
+    --home-band-pad-x: 1rem;
+    --home-band-pad-y: 1.5rem;
+  }
+
+  /* —— Páginas internas —— */
+  .page-content--pad {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: clamp(3.75rem, 14vw, 4.5rem);
+  }
+
+  .page-content--bitacora .page-header--blog,
+  .page-content--bitacora .bita-feed--aligned {
+    margin-left: 0;
+    max-width: 100%;
+  }
+
+  .bita-feed__cover {
+    width: 100%;
+    height: clamp(200px, 52vw, 280px);
+  }
+
+  .piezas-catalog {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .piezas-filters {
+    gap: 0.4rem;
+  }
+
+  .portfolio-obra__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portfolio-obra__title {
+    font-size: clamp(1.65rem, 7vw, 2rem);
+  }
+
+  .portfolio-band__title {
+    font-size: clamp(0.72rem, 3.2vw, 0.82rem);
+  }
+
+  .talleres-intro {
+    height: clamp(200px, 36svh, 320px);
+  }
+
+  .page-content--talleres {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .sobre-mi__split {
+    gap: 1.25rem;
+  }
+
+  .sobre-mi__text p {
+    font-size: 0.98rem;
+  }
+
+  /* —— Footer —— */
+  .site-footer__inner {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .site-footer__quote p {
+    font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+  }
+
+  .site-footer__credit-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .site-footer__developer {
+    margin-left: 0;
+    text-align: left;
+    font-size: 0.7rem;
+  }
+
+  /* —— Contacto —— */
+  .contacto-page {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .contacto-form {
+    padding: clamp(1.25rem, 5vw, 1.75rem);
+  }
+}
+
+/* Toggle oculto en escritorio */
+.site-nav-toggle,
+.site-nav-backdrop {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .site-nav-toggle {
+    display: inline-flex;
+  }
+
+  .site-nav-backdrop {
+    display: block;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @media (max-width: 767px) {
+    .site-nav__list,
+    .site-nav-toggle__icon::before,
+    .site-nav-toggle__icon::after {
+      transition: none;
+    }
+  }
+}
