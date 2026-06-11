@@ -844,13 +844,19 @@ export function AdminPage() {
                   />
                 </label>
                 <label className="admin-field">
-                  URL de vídeo embebido (YouTube/Vimeo, opcional)
+                  URL de vídeo (YouTube/Vimeo, opcional)
+                  <p className="admin-field__help">
+                    Pegá el enlace normal del video (por ejemplo
+                    <code> youtube.com/watch?v=… </code> o
+                    <code> youtu.be/… </code>). Se convierte solo al formato
+                    correcto para mostrarlo.
+                  </p>
                   <input
                     value={postDraft.videoUrl ?? ""}
                     onChange={(e) =>
                       setPostDraft({ ...postDraft, videoUrl: e.target.value })
                     }
-                    placeholder="https://www.youtube.com/embed/..."
+                    placeholder="https://www.youtube.com/watch?v=..."
                   />
                 </label>
                 <label className="admin-field">

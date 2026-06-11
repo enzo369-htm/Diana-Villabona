@@ -2,6 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { getPostById } from "../data/selectors";
 import { useContent } from "../context/ContentContext";
 import { plainTextToSafeHtml } from "../utils/plainText";
+import { toEmbedUrl } from "../utils/embedVideo";
 
 export function BitacoraPostPage() {
   const { posts } = useContent();
@@ -36,7 +37,7 @@ export function BitacoraPostPage() {
       {post.videoUrl ? (
         <div className="editorial__video">
           <iframe
-            src={post.videoUrl}
+            src={toEmbedUrl(post.videoUrl)}
             title="Vídeo embebido"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
