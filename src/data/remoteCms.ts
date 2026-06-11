@@ -1,5 +1,9 @@
 import { getAdminPassphrase } from "../lib/adminAuth";
-import { getSupabaseBrowser, isRemoteCmsEnabled } from "../lib/supabaseClient";
+import {
+  getSupabaseBrowser,
+  hasSupabaseBrowserEnv,
+  isRemoteCmsEnabled,
+} from "../lib/supabaseClient";
 import {
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
@@ -28,22 +32,47 @@ function normalizeRemotePayload(raw: unknown): StoredCms | null {
   };
 }
 
-export async function fetchRemoteCatalog(): Promise<StoredCms | null> {
-  const supabase = getSupabaseBrowser();
-  const { data, error } = await supabase
-    .from("site_catalog")
-    .select("payload")
-    .eq("id", CATALOG_ID)
-    .maybeSingle();
+async function fetchCatalogFromApi(): Promise<StoredCms | null> {
+  const res = await fetch("/api/cms");
+  if (!res.ok) {
+    const err = (await res.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(err?.error ?? `Error al cargar catálogo (${res.status})`);
+  }
+  const payload: unknown = await res.json();
+  if (payload === null) return null;
+  return normalizeRemotePayload(payload);
+}
 
-  if (error) throw error;
-  return normalizeRemotePayload(data?.payload);
+export async function fetchRemoteCatalog(): Promise<StoredCms | null> {
+  if (import.meta.env.PROD) {
+    return fetchCatalogFromApi();
+  }
+
+  if (hasSupabaseBrowserEnv()) {
+    const supabase = getSupabaseBrowser();
+    const { data, error } = await supabase
+      .from("site_catalog")
+      .select("payload")
+      .eq("id", CATALOG_ID)
+      .maybeSingle();
+
+    if (error) throw error;
+    return normalizeRemotePayload(data?.payload);
+  }
+
+  try {
+    return await fetchCatalogFromApi();
+  } catch {
+    return null;
+  }
 }
 
 export async function saveRemoteCatalog(data: StoredCms): Promise<void> {
   const pass = getAdminPassphrase();
   if (!pass) {
-    throw new Error("Sesión de administración sin contraseña.");
+    throw new Error(
+      "Sesión expirada. Cerrá esta pestaña, volvé a entrar en /admin e intentá de nuevo."
+    );
   }
 
   const res = await fetch("/api/cms", {
@@ -103,10 +132,4 @@ export async function uploadCmsImage(file: File): Promise<string> {
     throw new Error("El servidor no devolvió la URL de la imagen.");
   }
   return json.url;
-}
-
-export async function pushLocalCatalogToRemote(
-  data: StoredCms
-): Promise<void> {
-  await saveRemoteCatalog(data);
 }

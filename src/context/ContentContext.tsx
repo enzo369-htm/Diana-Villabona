@@ -148,10 +148,12 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
 
         if (remote) {
+          clearCms();
           applyStored(remote);
           saveCms(remote);
           setCmsSyncState("synced");
         } else {
+          clearCms();
           applyStored(null);
           setCmsSyncState("synced");
         }

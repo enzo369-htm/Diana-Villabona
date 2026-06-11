@@ -19,7 +19,7 @@ type AdminPortfolioTabProps = {
   draft: ObraPortfolio | null;
   setDraft: (obra: ObraPortfolio | null) => void;
   onSave: () => void | Promise<void>;
-  onDelete: () => void;
+  onDelete: () => void | Promise<void>;
   saving?: boolean;
 };
 
@@ -214,7 +214,8 @@ export function AdminPortfolioTab({
               <button
                 type="button"
                 className="admin-btn admin-btn--danger"
-                onClick={onDelete}
+                onClick={() => void onDelete()}
+                disabled={saving}
               >
                 Eliminar
               </button>

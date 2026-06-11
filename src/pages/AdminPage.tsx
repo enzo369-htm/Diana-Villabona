@@ -43,7 +43,11 @@ function newEmptyPost(): Post {
 }
 
 function cmsSyncLabel(state: string, usesCloud: boolean): string {
-  if (!usesCloud) return "Modo local (solo este navegador)";
+  if (!usesCloud) {
+    return import.meta.env.PROD
+      ? "Error: el CMS en la nube no está disponible"
+      : "Modo local (solo este navegador)";
+  }
   switch (state) {
     case "loading":
       return "Cargando desde la nube…";
@@ -222,11 +226,41 @@ export function AdminPage() {
     setObrasPortfolio,
   ]);
 
-  const deleteObra = useCallback(() => {
-    if (!obraDraft || !window.confirm("¿Eliminar esta obra del portafolio?")) return;
-    setObrasPortfolio(obrasPortfolio.filter((o) => o.id !== obraDraft.id));
-    setObraDraft(null);
-  }, [obraDraft, obrasPortfolio, setObrasPortfolio]);
+  const deleteObra = useCallback(async () => {
+    if (!obraDraft || savingObra) return;
+    if (!window.confirm("¿Eliminar esta obra del portafolio?")) return;
+
+    const removed = obraDraft;
+    const nextObras = obrasPortfolio.filter((o) => o.id !== obraDraft.id);
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres);
+
+    setSavingObra(true);
+    try {
+      setObrasPortfolio(nextObras);
+      setObraDraft(null);
+      await persistCatalog(catalog);
+      window.alert("Obra eliminada correctamente.");
+    } catch (err) {
+      setObrasPortfolio(obrasPortfolio);
+      setObraDraft(removed);
+      window.alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo eliminar la obra. Intentá de nuevo."
+      );
+    } finally {
+      setSavingObra(false);
+    }
+  }, [
+    obraDraft,
+    obrasPortfolio,
+    piezas,
+    posts,
+    talleres,
+    persistCatalog,
+    savingObra,
+    setObrasPortfolio,
+  ]);
 
   const saveTaller = useCallback(() => {
     if (!tallerDraft) return;
