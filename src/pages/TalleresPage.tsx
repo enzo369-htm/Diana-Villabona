@@ -11,6 +11,12 @@ function tallerExplorarHref(t: Taller): string {
   return whatsappLink(`Hola Diana, me interesa el taller «${t.titulo}».`);
 }
 
+/** Archivo de encuentros pasados: imágenes estáticas en /public (no se editan en el admin). */
+const ARCHIVO_FOTOS = Array.from(
+  { length: 9 },
+  (_, i) => `/encuentros-${i + 1}.jpg`
+);
+
 export function TalleresPage() {
   const { talleres } = useContent();
   const grilla = useMemo(() => talleresParaGrilla(talleres), [talleres]);
@@ -30,7 +36,8 @@ export function TalleresPage() {
           </p>
         </header>
 
-        <section className="talleres-section" aria-label="Encuentros">
+        <section className="talleres-section" aria-label="Próximos encuentros">
+          <h2 className="talleres-section__heading">Próximos encuentros</h2>
           {grilla.length === 0 ? (
             <p>Pronto publicaremos nuevas fechas.</p>
           ) : (
@@ -59,6 +66,26 @@ export function TalleresPage() {
               ))}
             </ul>
           )}
+        </section>
+
+        <section
+          className="talleres-section"
+          aria-label="Archivo de encuentros pasados"
+        >
+          <h2 className="talleres-section__heading">
+            Archivo de encuentros pasados
+          </h2>
+          <ul className="encuentros-archivo" role="list">
+            {ARCHIVO_FOTOS.map((src, i) => (
+              <li key={src} className="encuentros-archivo__item">
+                <img
+                  src={src}
+                  alt={`Encuentro pasado ${i + 1}`}
+                  loading="lazy"
+                />
+              </li>
+            ))}
+          </ul>
         </section>
 
         <div className="talleres-actions">
