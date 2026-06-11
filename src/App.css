@@ -2287,6 +2287,12 @@ article.page-content.page-content--pad.editorial {
   outline-offset: 2px;
 }
 
+/* Espacio blanco (10% viewport) entre tienda y footer — home y catálogo */
+.home-vitrina.home-band,
+.piezas-catalog {
+  margin-bottom: 10vh;
+}
+
 /* —— Home vitrina: 2×2 a pantalla completa (15" y similares) —— */
 .home-vitrina.home-band:has(.home-vitrina__grid) {
   --home-vitrina-top-clear: var(--site-header-h, 3.35rem);
@@ -2756,7 +2762,7 @@ article.page-content.page-content--pad.editorial {
 /* —— Piezas catálogo (misma vitrina que el home) —— */
 .piezas-catalog {
   padding-top: calc(var(--site-header-h, 3.35rem) + clamp(0.75rem, 2vh, 1.25rem));
-  padding-bottom: clamp(2rem, 4vh, 3rem);
+  padding-bottom: clamp(1rem, 2vh, 1.5rem);
 }
 
 .piezas-catalog__head {
