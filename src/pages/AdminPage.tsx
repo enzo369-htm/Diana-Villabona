@@ -9,7 +9,7 @@ import {
   normalizeStoredPost,
   normalizeStoredTaller,
 } from "../data/contentStore";
-import { IMAGE_MAX_BYTES } from "../data/remoteCms";
+import { IMAGE_MAX_BYTES, IMAGE_MAX_MB } from "../data/remoteCms";
 import { cmsImageHelpText, resolveCmsImageFromFile } from "../utils/cmsImage";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
 import { AdminTalleresTab } from "./AdminTalleresTab";
@@ -97,7 +97,7 @@ export function AdminPage() {
       for (const file of Array.from(files)) {
         if (file.size > IMAGE_MAX_BYTES) {
           window.alert(
-            `"${file.name}" supera ~2,5 MB. Comprímela o usa otra imagen.`
+            `"${file.name}" supera ~${IMAGE_MAX_MB} MB. Comprímela o usa otra imagen.`
           );
           continue;
         }
@@ -742,7 +742,7 @@ export function AdminPage() {
                           if (!file || !postDraft) return;
                           if (file.size > IMAGE_MAX_BYTES) {
                             window.alert(
-                              "La imagen supera ~2,5 MB. Comprímela o coloca el archivo en public/ y usa la ruta."
+                              `La imagen supera ~${IMAGE_MAX_MB} MB. Comprímela o coloca el archivo en public/ y usa la ruta.`
                             );
                             e.target.value = "";
                             return;

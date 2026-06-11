@@ -1,7 +1,7 @@
 import { useCallback, useRef } from "react";
 import type { ObraPortfolio } from "../types/content";
 import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
-import { IMAGE_MAX_BYTES } from "../data/remoteCms";
+import { IMAGE_MAX_BYTES, IMAGE_MAX_MB } from "../data/remoteCms";
 import { resolveCmsImageFromFile } from "../utils/cmsImage";
 
 export function newEmptyObraPortfolio(): ObraPortfolio {
@@ -38,7 +38,7 @@ export function AdminPortfolioTab({
       if (!draft || !file) return;
       if (file.size > IMAGE_MAX_BYTES) {
         window.alert(
-          `"${file.name}" supera ~2,5 MB. Comprímela o usa otra imagen.`
+          `"${file.name}" supera ~${IMAGE_MAX_MB} MB. Comprímela o usa otra imagen.`
         );
         return;
       }

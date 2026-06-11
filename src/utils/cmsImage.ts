@@ -1,6 +1,9 @@
-import { isRemoteCmsEnabled, uploadCmsImage } from "../data/remoteCms";
-
-const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
+import {
+  IMAGE_MAX_BYTES,
+  IMAGE_MAX_MB,
+  isRemoteCmsEnabled,
+  uploadCmsImage,
+} from "../data/remoteCms";
 
 function readImageAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -14,7 +17,7 @@ function readImageAsDataUrl(file: File): Promise<string> {
 /** Sube al almacenamiento en la nube si está configurado; si no, data URL local (solo este navegador). */
 export async function resolveCmsImageFromFile(file: File): Promise<string> {
   if (file.size > IMAGE_MAX_BYTES) {
-    throw new Error("La imagen supera 2,5 MB.");
+    throw new Error(`La imagen supera ${IMAGE_MAX_MB} MB.`);
   }
 
   if (isRemoteCmsEnabled()) {

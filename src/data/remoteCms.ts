@@ -14,7 +14,8 @@ import {
 export { isRemoteCmsEnabled };
 
 const CATALOG_ID = "main";
-export const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
+export const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+export const IMAGE_MAX_MB = IMAGE_MAX_BYTES / (1024 * 1024);
 
 function normalizeRemotePayload(raw: unknown): StoredCms | null {
   if (!raw || typeof raw !== "object") return null;
@@ -92,7 +93,7 @@ export async function saveRemoteCatalog(data: StoredCms): Promise<void> {
 
 export async function uploadCmsImage(file: File): Promise<string> {
   if (file.size > IMAGE_MAX_BYTES) {
-    throw new Error("La imagen supera 2,5 MB.");
+    throw new Error(`La imagen supera ${IMAGE_MAX_MB} MB.`);
   }
 
   const pass = getAdminPassphrase();
@@ -100,36 +101,49 @@ export async function uploadCmsImage(file: File): Promise<string> {
     throw new Error("Iniciá sesión en /admin antes de subir imágenes.");
   }
 
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error ?? new Error("No se pudo leer la imagen."));
-    reader.readAsDataURL(file);
-  });
-
-  const base64 = dataUrl.includes(",") ? dataUrl.split(",")[1]! : dataUrl;
-
-  const res = await fetch("/api/upload", {
+  const signRes = await fetch("/api/upload-sign", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${pass}`,
     },
     body: JSON.stringify({
-      file: base64,
       filename: file.name,
       contentType: file.type || "image/jpeg",
+      size: file.size,
     }),
   });
 
-  if (!res.ok) {
-    const err = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(err?.error ?? `Error al subir (${res.status})`);
+  if (!signRes.ok) {
+    const err = (await signRes.json().catch(() => null)) as { error?: string } | null;
+    throw new Error(err?.error ?? `Error al preparar subida (${signRes.status})`);
   }
 
-  const json = (await res.json()) as { url?: string };
-  if (!json.url) {
-    throw new Error("El servidor no devolvió la URL de la imagen.");
+  const signJson = (await signRes.json()) as {
+    signedUrl?: string;
+    publicUrl?: string;
+  };
+
+  if (!signJson.signedUrl || !signJson.publicUrl) {
+    throw new Error("El servidor no devolvió datos de subida.");
   }
-  return json.url;
+
+  const uploadRes = await fetch(signJson.signedUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type || "image/jpeg",
+    },
+    body: file,
+  });
+
+  if (!uploadRes.ok) {
+    const detail = await uploadRes.text().catch(() => "");
+    throw new Error(
+      detail
+        ? `Error al subir imagen: ${detail.slice(0, 200)}`
+        : `Error al subir (${uploadRes.status})`
+    );
+  }
+
+  return signJson.publicUrl;
 }
