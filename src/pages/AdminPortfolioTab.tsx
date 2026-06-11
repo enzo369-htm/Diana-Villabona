@@ -1,17 +1,8 @@
 import { useCallback, useRef } from "react";
 import type { ObraPortfolio } from "../types/content";
 import { OBRAS_PORTFOLIO_IMAGENES } from "../types/content";
-
-const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
-
-function readImageFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-}
+import { IMAGE_MAX_BYTES } from "../data/remoteCms";
+import { resolveCmsImageFromFile } from "../utils/cmsImage";
 
 export function newEmptyObraPortfolio(): ObraPortfolio {
   return {
@@ -50,16 +41,18 @@ export function AdminPortfolioTab({
         return;
       }
       try {
-        const dataUrl = await readImageFile(file);
+        const url = await resolveCmsImageFromFile(file);
         const imagenes = [...draft.imagenes];
         while (imagenes.length < OBRAS_PORTFOLIO_IMAGENES) imagenes.push("");
-        imagenes[index] = dataUrl;
+        imagenes[index] = url;
         setDraft({
           ...draft,
           imagenes: imagenes.slice(0, OBRAS_PORTFOLIO_IMAGENES),
         });
-      } catch {
-        window.alert("No se pudo leer la imagen.");
+      } catch (err) {
+        window.alert(
+          err instanceof Error ? err.message : "No se pudo subir la imagen."
+        );
       }
     },
     [draft, setDraft]

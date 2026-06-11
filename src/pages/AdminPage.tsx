@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
 import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
@@ -9,6 +9,9 @@ import {
   normalizeStoredPost,
   normalizeStoredTaller,
 } from "../data/contentStore";
+import { getAdminPassphrase, setAdminSession } from "../lib/adminAuth";
+import { IMAGE_MAX_BYTES } from "../data/remoteCms";
+import { cmsImageHelpText, resolveCmsImageFromFile } from "../utils/cmsImage";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
 import { AdminTalleresTab } from "./AdminTalleresTab";
 
@@ -40,15 +43,20 @@ function newEmptyPost(): Post {
   };
 }
 
-const IMAGE_MAX_BYTES = 2.5 * 1024 * 1024;
-
-function readImageFile(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
+function cmsSyncLabel(state: string, usesCloud: boolean): string {
+  if (!usesCloud) return "Modo local (solo este navegador)";
+  switch (state) {
+    case "loading":
+      return "Cargando desde la nube…";
+    case "synced":
+      return "Sincronizado en la nube";
+    case "error":
+      return "Error al sincronizar — reintentá guardar";
+    case "local":
+      return "Datos locales pendientes de subir a la nube";
+    default:
+      return "";
+  }
 }
 
 export function AdminPage() {
@@ -57,11 +65,14 @@ export function AdminPage() {
     posts,
     obrasPortfolio,
     talleres,
+    cmsSyncState,
+    cmsUsesCloud,
     setPiezas,
     setPosts,
     setObrasPortfolio,
     setTalleres,
     resetToSeed,
+    pushCatalogToCloud,
   } = useContent();
   const [tab, setTab] = useState<
     "piezas" | "bitacora" | "portfolio" | "talleres"
@@ -72,6 +83,13 @@ export function AdminPage() {
   const [tallerDraft, setTallerDraft] = useState<Taller | null>(null);
   const portadaFileRef = useRef<HTMLInputElement>(null);
   const piezaImagesFileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const envPass = import.meta.env.VITE_ADMIN_PASSPHRASE?.trim();
+    if (!getAdminPassphrase() && envPass) {
+      setAdminSession(envPass);
+    }
+  }, []);
 
   const addPiezaImagesFromFiles = useCallback(
     async (files: FileList | null) => {
@@ -86,9 +104,11 @@ export function AdminPage() {
           continue;
         }
         try {
-          next.push(await readImageFile(file));
-        } catch {
-          window.alert(`No se pudo leer "${file.name}".`);
+          next.push(await resolveCmsImageFromFile(file));
+        } catch (err) {
+          window.alert(
+            err instanceof Error ? err.message : `No se pudo subir "${file.name}".`
+          );
         }
       }
 
@@ -277,8 +297,11 @@ export function AdminPage() {
       <header className="page-header">
         <h1>Administración</h1>
         <p className="page-header__lede">
-          Edición del catálogo, portafolio, encuentros y bitácora. Los cambios se guardan en
-          este navegador (localStorage). Las imágenes se eligen desde tu equipo.
+          Edición del catálogo, portafolio, encuentros y bitácora. Los cambios y las fotos
+          quedan guardados para todo el sitio (celular y computadora).
+        </p>
+        <p className="admin-sync-status" role="status">
+          {cmsSyncLabel(cmsSyncState, cmsUsesCloud)}
         </p>
       </header>
 
@@ -295,16 +318,33 @@ export function AdminPage() {
             onChange={(e) => importJson(e.target.files?.[0] ?? null)}
           />
         </label>
+        {cmsUsesCloud ? (
+          <button
+            type="button"
+            className="admin-btn admin-btn--secondary"
+            onClick={() => {
+              void pushCatalogToCloud()
+                .then(() => window.alert("Catálogo subido a la nube."))
+                .catch((err) =>
+                  window.alert(
+                    err instanceof Error ? err.message : "No se pudo subir el catálogo."
+                  )
+                );
+            }}
+          >
+            Subir catálogo a la nube
+          </button>
+        ) : null}
         <button
           type="button"
           className="admin-btn admin-btn--danger"
           onClick={() => {
             if (
               window.confirm(
-                "¿Volver a los datos por defecto del proyecto? Se borrará lo guardado en este navegador."
+                "¿Volver a los datos por defecto del proyecto? Se borrará el contenido guardado."
               )
             ) {
-              resetToSeed();
+              void resetToSeed();
               setPiezaDraft(null);
               setPostDraft(null);
               setObraDraft(null);
@@ -449,10 +489,7 @@ export function AdminPage() {
                 </label>
                 <div className="admin-field">
                   <span className="admin-field__label-text">Imágenes</span>
-                  <p className="admin-field__help">
-                    Elegí una o más fotos desde tu equipo. Se guardan en este
-                    navegador (como la portada de la bitácora).
-                  </p>
+                  <p className="admin-field__help">{cmsImageHelpText()}</p>
                   <div className="admin-portada-row">
                     <label className="admin-file-label admin-file-label--inline">
                       Elegir imágenes…
@@ -632,11 +669,13 @@ export function AdminPage() {
                 </label>
                 <div className="admin-field">
                   <span className="admin-field__label-text">Portada</span>
-                  <p className="admin-field__help">
-                    Puedes subir una imagen desde tu equipo (se guarda en este
-                    navegador) o escribir una ruta de archivo en{" "}
-                    <code>public/</code>.
-                  </p>
+                  <p className="admin-field__help">{cmsImageHelpText()}</p>
+                  {postDraft.portada.startsWith("data:") ? (
+                    <p className="admin-field__warn" role="status">
+                      Esta portada es antigua (solo este navegador). Volvé a elegir
+                      la imagen para subirla a la nube.
+                    </p>
+                  ) : null}
                   <div className="admin-portada-row">
                     <label className="admin-file-label admin-file-label--inline">
                       Elegir imagen…
@@ -656,10 +695,14 @@ export function AdminPage() {
                             return;
                           }
                           try {
-                            const dataUrl = await readImageFile(file);
-                            setPostDraft({ ...postDraft, portada: dataUrl });
-                          } catch {
-                            window.alert("No se pudo leer la imagen.");
+                            const url = await resolveCmsImageFromFile(file);
+                            setPostDraft({ ...postDraft, portada: url });
+                          } catch (err) {
+                            window.alert(
+                              err instanceof Error
+                                ? err.message
+                                : "No se pudo subir la imagen."
+                            );
                           }
                         }}
                       />
@@ -683,7 +726,7 @@ export function AdminPage() {
                     </div>
                   ) : null}
                   <label className="admin-field admin-field--tight">
-                    Ruta en public (si no subes archivo)
+                    O pegá una URL de imagen (opcional)
                     <input
                       type="text"
                       value={
@@ -692,7 +735,7 @@ export function AdminPage() {
                       onChange={(e) =>
                         setPostDraft({ ...postDraft, portada: e.target.value })
                       }
-                      placeholder="/portada.jpg"
+                      placeholder="https://… o /ruta-en-sitio.jpg"
                     />
                   </label>
                 </div>

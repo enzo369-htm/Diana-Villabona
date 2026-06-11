@@ -1,8 +1,7 @@
 import { type FormEvent, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
+import { adminSessionIsUnlocked, setAdminSession } from "../lib/adminAuth";
 import { AdminPage } from "../pages/AdminPage";
-
-const SESSION_KEY = "dvc-admin-session";
 
 function AdminPassphraseMissing() {
   return (
@@ -45,10 +44,6 @@ function AdminPassphraseMissing() {
   );
 }
 
-function sessionIsUnlocked(): boolean {
-  return sessionStorage.getItem(SESSION_KEY) === "1";
-}
-
 function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [value, setValue] = useState("");
   const [wrong, setWrong] = useState(false);
@@ -57,7 +52,7 @@ function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
     e.preventDefault();
     const expected = import.meta.env.VITE_ADMIN_PASSPHRASE ?? "";
     if (value === expected) {
-      sessionStorage.setItem(SESSION_KEY, "1");
+      setAdminSession(value);
       onSuccess();
       return;
     }
@@ -118,7 +113,7 @@ export function AdminGate() {
   const isProd = import.meta.env.PROD;
 
   const [unlocked, setUnlocked] = useState(() =>
-    phrase ? sessionIsUnlocked() : true
+    phrase ? adminSessionIsUnlocked() : true
   );
 
   if (!phrase) {

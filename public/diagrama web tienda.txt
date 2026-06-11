@@ -1,0 +1,18 @@
+┌────────────────────────────────────────────────────────┐
+ │                EL CEREBRO (Supabase)                   │
+ │   Guarda productos, imágenes, stock y ventas de        │
+ │   forma segura. Controla todo el motor de la tienda.   │
+ └───────────────▲────────────────────────▲───────────────┘
+                 │                        │
+         (Sube productos)          (Actualiza stock)
+                 │                        │
+ ┌───────────────┴────────┐      ┌────────┴───────────────┐
+ │ EL CONTROL (Panel Admin)│      │  LA VIDRIERA (Next.js) │
+ │ Donde vos gestionás    │      │  La web rápida donde   │
+ │ todo de forma simple.  │      │  el cliente compra.    │
+ └────────────────────────┘      └────────┬───────────────┘
+                                          │
+                                    (Paga online)
+                                          ▼
+                                 [Pasarela de Pagos]
+                                 (Mercado Pago / Stripe)

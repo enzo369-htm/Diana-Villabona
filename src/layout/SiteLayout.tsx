@@ -61,13 +61,8 @@ export function SiteLayout() {
         setScrollY(y);
 
         if (isHome) {
-          if (y <= 0) {
-            setHeaderHidden(false);
-          } else if (delta > SCROLL_DELTA) {
-            setHeaderHidden(true);
-          } else if (delta < -SCROLL_DELTA) {
-            setHeaderHidden(false);
-          }
+          // En home el nav alterna hero (texto rojo) ↔ barra blanca; no se oculta al bajar.
+          setHeaderHidden(false);
         } else if (y <= 0) {
           setHeaderHidden(false);
         } else if (delta > SCROLL_DELTA && y > SCROLL_MIN_TO_HIDE) {

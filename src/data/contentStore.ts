@@ -127,7 +127,19 @@ export function loadCms(): StoredCms | null {
 }
 
 export function saveCms(data: StoredCms): void {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    const quota =
+      err instanceof DOMException &&
+      (err.name === "QuotaExceededError" || err.code === 22);
+    if (quota) {
+      console.error(
+        "[CMS] localStorage lleno. Usa rutas en public/ en lugar de subir archivos."
+      );
+    }
+    throw err;
+  }
 }
 
 export function clearCms(): void {

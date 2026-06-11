@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -18,18 +19,30 @@ import {
   mergePostsWithSeed,
   mergeTalleresWithSeed,
   saveCms,
+  type StoredCms,
 } from "../data/contentStore";
+import {
+  fetchRemoteCatalog,
+  isRemoteCmsEnabled,
+  saveRemoteCatalog,
+} from "../data/remoteCms";
+
+export type CmsSyncState = "idle" | "loading" | "synced" | "local" | "error";
 
 export type ContentContextValue = {
   piezas: Pieza[];
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
   talleres: Taller[];
+  cmsReady: boolean;
+  cmsSyncState: CmsSyncState;
+  cmsUsesCloud: boolean;
   setPiezas: React.Dispatch<React.SetStateAction<Pieza[]>>;
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   setObrasPortfolio: React.Dispatch<React.SetStateAction<ObraPortfolio[]>>;
   setTalleres: React.Dispatch<React.SetStateAction<Taller[]>>;
-  resetToSeed: () => void;
+  resetToSeed: () => Promise<void>;
+  pushCatalogToCloud: () => Promise<void>;
 };
 
 const ContentContext = createContext<ContentContextValue | null>(null);
@@ -50,38 +63,136 @@ function cloneSeedTalleres(): Taller[] {
   return JSON.parse(JSON.stringify(seedTalleres)) as Taller[];
 }
 
+function buildCatalog(
+  piezas: Pieza[],
+  posts: Post[],
+  obrasPortfolio: ObraPortfolio[],
+  talleres: Taller[]
+): StoredCms {
+  return { piezas, posts, obrasPortfolio, talleres };
+}
+
 export function ContentProvider({ children }: { children: ReactNode }) {
-  const [piezas, setPiezas] = useState<Pieza[]>(() => {
-    const s = loadCms();
-    return mergePiezasWithSeed(s?.piezas ?? null, cloneSeedPiezas());
-  });
-  const [posts, setPosts] = useState<Post[]>(() => {
-    const s = loadCms();
-    return mergePostsWithSeed(s?.posts ?? null, cloneSeedPosts());
-  });
-  const [obrasPortfolio, setObrasPortfolio] = useState<ObraPortfolio[]>(() => {
-    const s = loadCms();
-    return mergeObrasPortfolioWithSeed(
-      s?.obrasPortfolio ?? null,
-      cloneSeedObrasPortfolio()
+  const usesCloud = isRemoteCmsEnabled();
+  const [cmsReady, setCmsReady] = useState(!usesCloud);
+  const [cmsSyncState, setCmsSyncState] = useState<CmsSyncState>(
+    usesCloud ? "loading" : "local"
+  );
+  const hydrated = useRef(false);
+
+  const [piezas, setPiezas] = useState<Pieza[]>(cloneSeedPiezas);
+  const [posts, setPosts] = useState<Post[]>(cloneSeedPosts);
+  const [obrasPortfolio, setObrasPortfolio] = useState<ObraPortfolio[]>(
+    cloneSeedObrasPortfolio
+  );
+  const [talleres, setTalleres] = useState<Taller[]>(cloneSeedTalleres);
+
+  const applyStored = useCallback((stored: StoredCms | null) => {
+    setPiezas(mergePiezasWithSeed(stored?.piezas ?? null, cloneSeedPiezas()));
+    setPosts(mergePostsWithSeed(stored?.posts ?? null, cloneSeedPosts()));
+    setObrasPortfolio(
+      mergeObrasPortfolioWithSeed(
+        stored?.obrasPortfolio ?? null,
+        cloneSeedObrasPortfolio()
+      )
     );
-  });
-  const [talleres, setTalleres] = useState<Taller[]>(() => {
-    const s = loadCms();
-    return mergeTalleresWithSeed(s?.talleres ?? null, cloneSeedTalleres());
-  });
+    setTalleres(
+      mergeTalleresWithSeed(stored?.talleres ?? null, cloneSeedTalleres())
+    );
+  }, []);
 
   useEffect(() => {
-    saveCms({ piezas, posts, obrasPortfolio, talleres });
-  }, [piezas, posts, obrasPortfolio, talleres]);
+    let cancelled = false;
 
-  const resetToSeed = useCallback(() => {
+    async function hydrate() {
+      if (!usesCloud) {
+        applyStored(loadCms());
+        hydrated.current = true;
+        setCmsReady(true);
+        setCmsSyncState("local");
+        return;
+      }
+
+      setCmsSyncState("loading");
+      try {
+        const remote = await fetchRemoteCatalog();
+        if (cancelled) return;
+
+        if (remote) {
+          applyStored(remote);
+          saveCms(remote);
+          setCmsSyncState("synced");
+        } else {
+          const local = loadCms();
+          applyStored(local);
+          setCmsSyncState(local ? "local" : "synced");
+        }
+      } catch (err) {
+        console.warn("[CMS] No se pudo cargar desde la nube:", err);
+        if (!cancelled) {
+          applyStored(loadCms());
+          setCmsSyncState("error");
+        }
+      } finally {
+        if (!cancelled) {
+          hydrated.current = true;
+          setCmsReady(true);
+        }
+      }
+    }
+
+    void hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [applyStored, usesCloud]);
+
+  useEffect(() => {
+    if (!cmsReady || !hydrated.current) return;
+
+    const catalog = buildCatalog(piezas, posts, obrasPortfolio, talleres);
+    saveCms(catalog);
+
+    if (!usesCloud) return;
+
+    const timer = window.setTimeout(() => {
+      void saveRemoteCatalog(catalog)
+        .then(() => setCmsSyncState("synced"))
+        .catch((err) => {
+          console.error("[CMS] Error al sincronizar:", err);
+          setCmsSyncState("error");
+        });
+    }, 700);
+
+    return () => window.clearTimeout(timer);
+  }, [piezas, posts, obrasPortfolio, talleres, cmsReady, usesCloud]);
+
+  const resetToSeed = useCallback(async () => {
     clearCms();
-    setPiezas(cloneSeedPiezas());
-    setPosts(cloneSeedPosts());
-    setObrasPortfolio(cloneSeedObrasPortfolio());
-    setTalleres(cloneSeedTalleres());
-  }, []);
+    const seedCatalog = buildCatalog(
+      cloneSeedPiezas(),
+      cloneSeedPosts(),
+      cloneSeedObrasPortfolio(),
+      cloneSeedTalleres()
+    );
+    setPiezas(seedCatalog.piezas);
+    setPosts(seedCatalog.posts);
+    setObrasPortfolio(seedCatalog.obrasPortfolio);
+    setTalleres(seedCatalog.talleres);
+    saveCms(seedCatalog);
+
+    if (usesCloud) {
+      await saveRemoteCatalog(seedCatalog);
+      setCmsSyncState("synced");
+    }
+  }, [usesCloud]);
+
+  const pushCatalogToCloud = useCallback(async () => {
+    if (!usesCloud) return;
+    const catalog = buildCatalog(piezas, posts, obrasPortfolio, talleres);
+    await saveRemoteCatalog(catalog);
+    setCmsSyncState("synced");
+  }, [piezas, posts, obrasPortfolio, talleres, usesCloud]);
 
   const value = useMemo(
     (): ContentContextValue => ({
@@ -89,13 +200,27 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      cmsReady,
+      cmsSyncState,
+      cmsUsesCloud: usesCloud,
       setPiezas,
       setPosts,
       setObrasPortfolio,
       setTalleres,
       resetToSeed,
+      pushCatalogToCloud,
     }),
-    [piezas, posts, obrasPortfolio, talleres, resetToSeed]
+    [
+      piezas,
+      posts,
+      obrasPortfolio,
+      talleres,
+      cmsReady,
+      cmsSyncState,
+      usesCloud,
+      resetToSeed,
+      pushCatalogToCloud,
+    ]
   );
 
   return (

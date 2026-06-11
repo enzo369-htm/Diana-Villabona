@@ -11,7 +11,6 @@ export const NAV_ITEMS = [
   { to: "/sobre-mi", label: "Acerca" },
 ] as const;
 
-/** Sustituir por el correo real de contacto. */
 export const CONTACT_EMAIL = "villabonadiana2@gmail.com";
 
 export const INSTAGRAM_URL = "https://www.instagram.com/dianavillabonaceramica";
