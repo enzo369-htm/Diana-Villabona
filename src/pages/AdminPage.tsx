@@ -54,7 +54,7 @@ function cmsSyncLabel(state: string, usesCloud: boolean): string {
     case "synced":
       return "Sincronizado en la nube";
     case "error":
-      return "Error al sincronizar — reintentá guardar";
+      return "No se pudo conectar con la nube — revisá Supabase en Vercel o usá «Subir catálogo a la nube»";
     case "local":
       return "Datos locales pendientes de subir a la nube";
     default:

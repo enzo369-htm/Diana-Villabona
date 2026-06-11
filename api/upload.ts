@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth, getSupabaseAdmin } from "./_lib/supabaseAdmin";
+import { assertAdminAuth } from "./_lib/supabaseAdmin";
+import { publicMediaUrl, uploadMediaBuffer } from "./_lib/supabaseRest";
 
 /** Ruta legacy (base64). Preferir /api/upload-sign + subida directa a Supabase. */
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -48,27 +49,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const buffer = Buffer.from(base64, "base64");
     if (buffer.byteLength > MAX_BYTES) {
-      return res.status(400).json({ error: `La imagen supera ${MAX_BYTES / (1024 * 1024)} MB` });
+      return res.status(400).json({
+        error: `La imagen supera ${MAX_BYTES / (1024 * 1024)} MB`,
+      });
     }
 
     const path = `uploads/${Date.now()}-${filename}`;
-    const supabase = getSupabaseAdmin();
-    const { error: uploadError } = await supabase.storage
-      .from("cms-media")
-      .upload(path, buffer, {
-        contentType,
-        upsert: false,
-      });
+    await uploadMediaBuffer(path, buffer, contentType);
 
-    if (uploadError) {
-      return res.status(500).json({ error: uploadError.message });
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("cms-media").getPublicUrl(path);
-
-    return res.status(200).json({ url: publicUrl });
+    return res.status(200).json({ url: publicMediaUrl(path) });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error interno";
     return res.status(500).json({ error: message });

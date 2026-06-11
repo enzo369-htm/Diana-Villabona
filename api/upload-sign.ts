@@ -1,5 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth, getSupabaseAdmin } from "./_lib/supabaseAdmin";
+import { assertAdminAuth } from "./_lib/supabaseAdmin";
+import {
+  createSignedUploadUrl,
+  publicMediaUrl,
+} from "./_lib/supabaseRest";
 
 /** Fotos van directo a Supabase (no pasan por el cuerpo de la función). */
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -53,23 +57,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const path = `uploads/${Date.now()}-${filename}`;
-    const supabase = getSupabaseAdmin();
-
-    const { data, error } = await supabase.storage
-      .from("cms-media")
-      .createSignedUploadUrl(path, { upsert: false });
-
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("cms-media").getPublicUrl(path);
+    const { signedUrl } = await createSignedUploadUrl(path);
 
     return res.status(200).json({
-      signedUrl: data.signedUrl,
-      publicUrl,
+      signedUrl,
+      publicUrl: publicMediaUrl(path),
       path,
     });
   } catch (err) {

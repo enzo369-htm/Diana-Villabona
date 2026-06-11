@@ -1,23 +1,15 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth, getSupabaseAdmin } from "./_lib/supabaseAdmin";
-
-const CATALOG_ID = "main";
+import { assertAdminAuth } from "./_lib/supabaseAdmin";
+import {
+  fetchCatalogPayload,
+  upsertCatalogPayload,
+} from "./_lib/supabaseRest";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     if (req.method === "GET") {
-      const supabase = getSupabaseAdmin();
-      const { data, error } = await supabase
-        .from("site_catalog")
-        .select("payload")
-        .eq("id", CATALOG_ID)
-        .maybeSingle();
-
-      if (error) {
-        return res.status(500).json({ error: error.message });
-      }
-
-      return res.status(200).json(data?.payload ?? null);
+      const payload = await fetchCatalogPayload();
+      return res.status(200).json(payload ?? null);
     }
 
     if (req.method === "PUT") {
@@ -30,17 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ error: "Cuerpo inválido" });
       }
 
-      const supabase = getSupabaseAdmin();
-      const { error } = await supabase.from("site_catalog").upsert({
-        id: CATALOG_ID,
-        payload,
-        updated_at: new Date().toISOString(),
-      });
-
-      if (error) {
-        return res.status(500).json({ error: error.message });
-      }
-
+      await upsertCatalogPayload(payload);
       return res.status(200).json({ ok: true });
     }
 

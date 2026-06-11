@@ -21,6 +21,7 @@ import {
   saveCms,
   type StoredCms,
 } from "../data/contentStore";
+import { getAdminPassphrase } from "../lib/adminAuth";
 import {
   fetchRemoteCatalog,
   isRemoteCmsEnabled,
@@ -186,6 +187,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       if (!saveCms(catalog)) {
         setCmsSyncState("error");
       }
+      return;
+    }
+
+    // Solo sincronizar cuando hay sesión de /admin (evita errores al recargar sin login).
+    if (!getAdminPassphrase()) {
       return;
     }
 
