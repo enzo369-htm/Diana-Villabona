@@ -1012,16 +1012,6 @@ export function AdminPage() {
                     </ul>
                   ) : null}
                 </div>
-                <label className="admin-field admin-field--inline">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(postDraft.destacado)}
-                    onChange={(e) =>
-                      setPostDraft({ ...postDraft, destacado: e.target.checked })
-                    }
-                  />
-                  Destacada (el home usa <code>homeConfig.idPostDestacado</code> en código)
-                </label>
                 <div className="admin-form-actions">
                   <button type="submit" className="admin-btn admin-btn--primary">
                     Guardar entrada

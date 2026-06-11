@@ -3125,12 +3125,19 @@ article.page-content.page-content--pad.editorial {
 /* Mobile: el cuerpo va primero y las imágenes debajo, al terminar el texto. */
 @media (min-width: 860px) {
   .editorial__layout {
-    grid-template-columns: minmax(0, 1fr) clamp(260px, 32%, 360px);
+    grid-template-columns: minmax(0, 42rem) 1fr;
     align-items: start;
     gap: 2.5rem;
   }
   .editorial__body {
     max-width: 42rem;
+  }
+  /* Las imágenes se centran en el espacio en blanco que queda a la derecha. */
+  .editorial__gallery {
+    align-items: center;
+  }
+  .editorial__gallery img {
+    max-width: 360px;
   }
 }
 
