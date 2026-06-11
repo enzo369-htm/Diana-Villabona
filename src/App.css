@@ -3585,11 +3585,15 @@ article.page-content.page-content--pad.editorial {
 }
 
 .sobre-mi__text p {
-  margin: 0;
+  margin: 0 0 1.1rem;
   max-width: 38rem;
   font-size: 1rem;
   line-height: 1.75;
   color: var(--ink);
+}
+
+.sobre-mi__text p:last-child {
+  margin-bottom: 0;
 }
 
 /* —— Admin —— */
