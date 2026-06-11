@@ -1,6 +1,10 @@
 import { type FormEvent, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { adminSessionIsUnlocked, setAdminSession } from "../lib/adminAuth";
+import {
+  adminSessionIsUnlocked,
+  sanitizePassphrase,
+  setAdminSession,
+} from "../lib/adminAuth";
 import { AdminPage } from "../pages/AdminPage";
 
 function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
@@ -25,15 +29,17 @@ function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
     setServerError(false);
     setLoading(true);
 
+    const clean = sanitizePassphrase(value);
+
     try {
       const res = await fetch("/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: value }),
+        body: JSON.stringify({ password: clean }),
       });
 
       if (res.ok) {
-        setAdminSession(value);
+        setAdminSession(clean);
         onSuccess();
         return;
       }
@@ -48,11 +54,11 @@ function AdminLoginForm({ onSuccess }: { onSuccess: () => void }) {
         return;
       }
 
-      if (tryDevFallback(value)) return;
+      if (tryDevFallback(clean)) return;
 
       setWrong(true);
     } catch {
-      if (tryDevFallback(value)) return;
+      if (tryDevFallback(clean)) return;
       setWrong(true);
     } finally {
       setLoading(false);

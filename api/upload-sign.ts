@@ -9,11 +9,15 @@ const ALLOWED_TYPES = new Set([
   "image/gif",
 ]);
 
+function clean(value: string | undefined): string {
+  return (value ?? "").replace(/[\u200B-\u200D\uFEFF\u00A0]/g, "").trim();
+}
+
 function assertAdminAuth(authHeader: string | undefined): boolean {
-  const secret = process.env.CMS_ADMIN_SECRET?.trim();
+  const secret = clean(process.env.CMS_ADMIN_SECRET);
   if (!secret) return false;
   const token = authHeader?.startsWith("Bearer ")
-    ? authHeader.slice(7).trim()
+    ? clean(authHeader.slice(7))
     : "";
   return token.length > 0 && token === secret;
 }

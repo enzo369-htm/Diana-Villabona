@@ -16,6 +16,20 @@ create policy "catalog_public_read"
   for select
   using (true);
 
+-- Respaldos automáticos: antes de cada guardado se copia aquí la versión anterior.
+-- Sin políticas públicas: solo el servidor (service role) lee/escribe esta tabla.
+create table if not exists public.site_catalog_backup (
+  id bigint generated always as identity primary key,
+  catalog_id text not null,
+  payload jsonb not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.site_catalog_backup enable row level security;
+
+create index if not exists site_catalog_backup_created_idx
+  on public.site_catalog_backup (created_at desc);
+
 -- Bucket de imágenes del CMS (público para leer; escribir solo vía API con service role)
 insert into storage.buckets (id, name, public)
 values ('cms-media', 'cms-media', true)
