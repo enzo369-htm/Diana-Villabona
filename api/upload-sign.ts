@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth } from "./_lib/supabaseAdmin";
+import { assertAdminAuth } from "./lib/supabaseAdmin";
 import {
   createSignedUploadUrl,
   publicMediaUrl,
-} from "./_lib/supabaseRest";
+} from "./lib/supabaseRest";
 
 /** Fotos van directo a Supabase (no pasan por el cuerpo de la función). */
 const MAX_BYTES = 10 * 1024 * 1024;

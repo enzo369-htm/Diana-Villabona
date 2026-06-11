@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth } from "./_lib/supabaseAdmin";
-import { publicMediaUrl, uploadMediaBuffer } from "./_lib/supabaseRest";
+import { assertAdminAuth } from "./lib/supabaseAdmin";
+import { publicMediaUrl, uploadMediaBuffer } from "./lib/supabaseRest";
 
 /** Ruta legacy (base64). Preferir /api/upload-sign + subida directa a Supabase. */
 const MAX_BYTES = 10 * 1024 * 1024;

@@ -37,6 +37,7 @@ export type ContentContextValue = {
   talleres: Taller[];
   cmsReady: boolean;
   cmsSyncState: CmsSyncState;
+  cmsSyncError: string | null;
   cmsUsesCloud: boolean;
   setPiezas: React.Dispatch<React.SetStateAction<Pieza[]>>;
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
@@ -80,6 +81,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [cmsSyncState, setCmsSyncState] = useState<CmsSyncState>(
     usesCloud ? "loading" : "local"
   );
+  const [cmsSyncError, setCmsSyncError] = useState<string | null>(null);
   const hydrated = useRef(false);
 
   const [piezas, setPiezas] = useState<Pieza[]>(cloneSeedPiezas);
@@ -110,6 +112,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         catalog ??
         buildCatalog(piezas, posts, obrasPortfolio, talleres);
       await saveRemoteCatalog(payload);
+      setCmsSyncError(null);
       setCmsSyncState("synced");
     },
     [piezas, posts, obrasPortfolio, talleres, usesCloud]
@@ -152,16 +155,21 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           clearCms();
           applyStored(remote);
           saveCms(remote);
+          setCmsSyncError(null);
           setCmsSyncState("synced");
         } else {
           clearCms();
           applyStored(null);
+          setCmsSyncError(null);
           setCmsSyncState("synced");
         }
       } catch (err) {
         console.warn("[CMS] No se pudo cargar desde la nube:", err);
         if (!cancelled) {
+          const message =
+            err instanceof Error ? err.message : "Error desconocido al cargar";
           applyStored(null);
+          setCmsSyncError(message);
           setCmsSyncState("error");
         }
       } finally {
@@ -197,9 +205,15 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 
     const timer = window.setTimeout(() => {
       void saveRemoteCatalog(catalog)
-        .then(() => setCmsSyncState("synced"))
+        .then(() => {
+          setCmsSyncError(null);
+          setCmsSyncState("synced");
+        })
         .catch((err) => {
           console.error("[CMS] Error al sincronizar:", err);
+          setCmsSyncError(
+            err instanceof Error ? err.message : "Error al sincronizar"
+          );
           setCmsSyncState("error");
         });
     }, 700);
@@ -230,6 +244,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       talleres,
       cmsReady,
       cmsSyncState,
+      cmsSyncError,
       cmsUsesCloud: usesCloud,
       setPiezas,
       setPosts,
@@ -246,6 +261,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       talleres,
       cmsReady,
       cmsSyncState,
+      cmsSyncError,
       usesCloud,
       resetToSeed,
       pushCatalogToCloud,

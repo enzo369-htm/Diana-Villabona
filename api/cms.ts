@@ -1,9 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth } from "./_lib/supabaseAdmin";
+import { assertAdminAuth } from "./lib/supabaseAdmin";
 import {
   fetchCatalogPayload,
   upsertCatalogPayload,
-} from "./_lib/supabaseRest";
+} from "./lib/supabaseRest";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {

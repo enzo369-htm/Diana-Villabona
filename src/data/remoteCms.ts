@@ -33,11 +33,26 @@ function normalizeRemotePayload(raw: unknown): StoredCms | null {
   };
 }
 
+async function readApiError(res: Response, fallback: string): Promise<string> {
+  const text = await res.text().catch(() => "");
+  try {
+    const json = JSON.parse(text) as { error?: string };
+    if (json.error) return json.error;
+  } catch {
+    /* respuesta no JSON */
+  }
+  if (text.includes("FUNCTION_INVOCATION_FAILED")) {
+    return "El servidor del CMS falló al arrancar. Revisá el deploy en Vercel y las variables SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY.";
+  }
+  return text.trim() || fallback;
+}
+
 async function fetchCatalogFromApi(): Promise<StoredCms | null> {
   const res = await fetch("/api/cms");
   if (!res.ok) {
-    const err = (await res.json().catch(() => null)) as { error?: string } | null;
-    throw new Error(err?.error ?? `Error al cargar catálogo (${res.status})`);
+    throw new Error(
+      await readApiError(res, `Error al cargar catálogo (${res.status})`)
+    );
   }
   const payload: unknown = await res.json();
   if (payload === null) return null;

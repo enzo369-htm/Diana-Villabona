@@ -42,7 +42,11 @@ function newEmptyPost(): Post {
   };
 }
 
-function cmsSyncLabel(state: string, usesCloud: boolean): string {
+function cmsSyncLabel(
+  state: string,
+  usesCloud: boolean,
+  error: string | null
+): string {
   if (!usesCloud) {
     return import.meta.env.PROD
       ? "Error: el CMS en la nube no está disponible"
@@ -54,7 +58,9 @@ function cmsSyncLabel(state: string, usesCloud: boolean): string {
     case "synced":
       return "Sincronizado en la nube";
     case "error":
-      return "No se pudo conectar con la nube — revisá Supabase en Vercel o usá «Subir catálogo a la nube»";
+      return error
+        ? `Error de nube: ${error}`
+        : "No se pudo conectar con la nube — revisá Supabase en Vercel";
     case "local":
       return "Datos locales pendientes de subir a la nube";
     default:
@@ -69,6 +75,7 @@ export function AdminPage() {
     obrasPortfolio,
     talleres,
     cmsSyncState,
+    cmsSyncError,
     cmsUsesCloud,
     setPiezas,
     setPosts,
@@ -353,7 +360,7 @@ export function AdminPage() {
           quedan guardados para todo el sitio (celular y computadora).
         </p>
         <p className="admin-sync-status" role="status">
-          {cmsSyncLabel(cmsSyncState, cmsUsesCloud)}
+          {cmsSyncLabel(cmsSyncState, cmsUsesCloud, cmsSyncError)}
         </p>
       </header>
 

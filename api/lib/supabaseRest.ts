@@ -7,7 +7,7 @@ export function getSupabaseConfig(): { url: string; key: string } {
   return { url: url.replace(/\/$/, ""), key };
 }
 
-function serviceHeaders(key: string, extra?: Record<string, string>): HeadersInit {
+function serviceHeaders(key: string, extra?: Record<string, string>): Record<string, string> {
   return {
     apikey: key,
     Authorization: `Bearer ${key}`,
