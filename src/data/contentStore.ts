@@ -126,19 +126,23 @@ export function loadCms(): StoredCms | null {
   }
 }
 
-export function saveCms(data: StoredCms): void {
+/** Guarda en localStorage. Devuelve false si falla (p. ej. almacenamiento lleno). */
+export function saveCms(data: StoredCms): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    return true;
   } catch (err) {
     const quota =
       err instanceof DOMException &&
       (err.name === "QuotaExceededError" || err.code === 22);
     if (quota) {
       console.error(
-        "[CMS] localStorage lleno. Usa rutas en public/ en lugar de subir archivos."
+        "[CMS] localStorage lleno — el catálogo es demasiado grande para este navegador."
       );
+    } else {
+      console.error("[CMS] No se pudo guardar en localStorage:", err);
     }
-    throw err;
+    return false;
   }
 }
 

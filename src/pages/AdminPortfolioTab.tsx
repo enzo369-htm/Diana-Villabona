@@ -18,8 +18,9 @@ type AdminPortfolioTabProps = {
   obras: ObraPortfolio[];
   draft: ObraPortfolio | null;
   setDraft: (obra: ObraPortfolio | null) => void;
-  onSave: () => void;
+  onSave: () => void | Promise<void>;
   onDelete: () => void;
+  saving?: boolean;
 };
 
 export function AdminPortfolioTab({
@@ -28,6 +29,7 @@ export function AdminPortfolioTab({
   setDraft,
   onSave,
   onDelete,
+  saving = false,
 }: AdminPortfolioTabProps) {
   const slotRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -111,7 +113,7 @@ export function AdminPortfolioTab({
             className="admin-form"
             onSubmit={(e) => {
               e.preventDefault();
-              onSave();
+              void onSave();
             }}
           >
             <p className="admin-form__hint">
@@ -202,8 +204,12 @@ export function AdminPortfolioTab({
               </div>
             </div>
             <div className="admin-form-actions">
-              <button type="submit" className="admin-btn admin-btn--primary">
-                Guardar obra
+              <button
+                type="submit"
+                className="admin-btn admin-btn--primary"
+                disabled={saving}
+              >
+                {saving ? "Guardando…" : "Guardar obra"}
               </button>
               <button
                 type="button"

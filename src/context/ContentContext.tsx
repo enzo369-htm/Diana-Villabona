@@ -42,7 +42,8 @@ export type ContentContextValue = {
   setObrasPortfolio: React.Dispatch<React.SetStateAction<ObraPortfolio[]>>;
   setTalleres: React.Dispatch<React.SetStateAction<Taller[]>>;
   resetToSeed: () => Promise<void>;
-  pushCatalogToCloud: () => Promise<void>;
+  pushCatalogToCloud: (catalog?: StoredCms) => Promise<void>;
+  persistCatalog: (catalog: StoredCms) => Promise<void>;
 };
 
 const ContentContext = createContext<ContentContextValue | null>(null);
@@ -63,7 +64,7 @@ function cloneSeedTalleres(): Taller[] {
   return JSON.parse(JSON.stringify(seedTalleres)) as Taller[];
 }
 
-function buildCatalog(
+export function buildCatalog(
   piezas: Pieza[],
   posts: Post[],
   obrasPortfolio: ObraPortfolio[],
@@ -101,6 +102,34 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  const pushCatalogToCloud = useCallback(
+    async (catalog?: StoredCms) => {
+      if (!usesCloud) return;
+      const payload =
+        catalog ??
+        buildCatalog(piezas, posts, obrasPortfolio, talleres);
+      await saveRemoteCatalog(payload);
+      setCmsSyncState("synced");
+    },
+    [piezas, posts, obrasPortfolio, talleres, usesCloud]
+  );
+
+  const persistCatalog = useCallback(
+    async (catalog: StoredCms) => {
+      if (usesCloud) {
+        await pushCatalogToCloud(catalog);
+        return;
+      }
+      if (!saveCms(catalog)) {
+        throw new Error(
+          "No se pudo guardar en este navegador (almacenamiento lleno)."
+        );
+      }
+      setCmsSyncState("local");
+    },
+    [pushCatalogToCloud, usesCloud]
+  );
+
   useEffect(() => {
     let cancelled = false;
 
@@ -123,14 +152,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           saveCms(remote);
           setCmsSyncState("synced");
         } else {
-          const local = loadCms();
-          applyStored(local);
-          setCmsSyncState(local ? "local" : "synced");
+          applyStored(null);
+          setCmsSyncState("synced");
         }
       } catch (err) {
         console.warn("[CMS] No se pudo cargar desde la nube:", err);
         if (!cancelled) {
-          applyStored(loadCms());
+          applyStored(null);
           setCmsSyncState("error");
         }
       } finally {
@@ -151,9 +179,13 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     if (!cmsReady || !hydrated.current) return;
 
     const catalog = buildCatalog(piezas, posts, obrasPortfolio, talleres);
-    saveCms(catalog);
 
-    if (!usesCloud) return;
+    if (!usesCloud) {
+      if (!saveCms(catalog)) {
+        setCmsSyncState("error");
+      }
+      return;
+    }
 
     const timer = window.setTimeout(() => {
       void saveRemoteCatalog(catalog)
@@ -179,20 +211,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setPosts(seedCatalog.posts);
     setObrasPortfolio(seedCatalog.obrasPortfolio);
     setTalleres(seedCatalog.talleres);
-    saveCms(seedCatalog);
-
-    if (usesCloud) {
-      await saveRemoteCatalog(seedCatalog);
-      setCmsSyncState("synced");
-    }
-  }, [usesCloud]);
-
-  const pushCatalogToCloud = useCallback(async () => {
-    if (!usesCloud) return;
-    const catalog = buildCatalog(piezas, posts, obrasPortfolio, talleres);
-    await saveRemoteCatalog(catalog);
-    setCmsSyncState("synced");
-  }, [piezas, posts, obrasPortfolio, talleres, usesCloud]);
+    await persistCatalog(seedCatalog);
+  }, [persistCatalog]);
 
   const value = useMemo(
     (): ContentContextValue => ({
@@ -209,6 +229,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       setTalleres,
       resetToSeed,
       pushCatalogToCloud,
+      persistCatalog,
     }),
     [
       piezas,
@@ -220,6 +241,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       usesCloud,
       resetToSeed,
       pushCatalogToCloud,
+      persistCatalog,
     ]
   );
 

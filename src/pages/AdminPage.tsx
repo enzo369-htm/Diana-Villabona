@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
 import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
-import { useContent } from "../context/ContentContext";
+import { buildCatalog, useContent } from "../context/ContentContext";
 import {
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
@@ -72,7 +72,9 @@ export function AdminPage() {
     setTalleres,
     resetToSeed,
     pushCatalogToCloud,
+    persistCatalog,
   } = useContent();
+  const [savingObra, setSavingObra] = useState(false);
   const [tab, setTab] = useState<
     "piezas" | "bitacora" | "portfolio" | "talleres"
   >("piezas");
@@ -174,8 +176,8 @@ export function AdminPage() {
     setPostDraft(null);
   }, [postDraft, posts, setPosts]);
 
-  const saveObra = useCallback(() => {
-    if (!obraDraft) return;
+  const saveObra = useCallback(async () => {
+    if (!obraDraft || savingObra) return;
     const imagenes = obraDraft.imagenes.map((s) => s.trim());
     const filled = imagenes.filter(Boolean);
     if (filled.length !== OBRAS_PORTFOLIO_IMAGENES) {
@@ -187,14 +189,38 @@ export function AdminPage() {
       imagenes,
     });
     const idx = obrasPortfolio.findIndex((o) => o.id === next.id);
-    if (idx >= 0) {
-      const copy = [...obrasPortfolio];
-      copy[idx] = next;
-      setObrasPortfolio(copy);
-    } else {
-      setObrasPortfolio([...obrasPortfolio, next]);
+    const nextObras =
+      idx >= 0
+        ? obrasPortfolio.map((o, i) => (i === idx ? next : o))
+        : [...obrasPortfolio, next];
+
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres);
+
+    setSavingObra(true);
+    try {
+      setObrasPortfolio(nextObras);
+      await persistCatalog(catalog);
+      setObraDraft(next);
+      window.alert("Obra guardada correctamente.");
+    } catch (err) {
+      window.alert(
+        err instanceof Error
+          ? err.message
+          : "No se pudo guardar la obra. Intentá de nuevo."
+      );
+    } finally {
+      setSavingObra(false);
     }
-  }, [obraDraft, obrasPortfolio, setObrasPortfolio]);
+  }, [
+    obraDraft,
+    obrasPortfolio,
+    piezas,
+    posts,
+    talleres,
+    persistCatalog,
+    savingObra,
+    setObrasPortfolio,
+  ]);
 
   const deleteObra = useCallback(() => {
     if (!obraDraft || !window.confirm("¿Eliminar esta obra del portafolio?")) return;
@@ -590,6 +616,7 @@ export function AdminPage() {
           setDraft={setObraDraft}
           onSave={saveObra}
           onDelete={deleteObra}
+          saving={savingObra}
         />
       ) : tab === "talleres" ? (
         <AdminTalleresTab
