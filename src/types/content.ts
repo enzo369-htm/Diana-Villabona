@@ -25,7 +25,13 @@ export interface Post {
   videoUrl?: string;
   extracto: string;
   destacado?: boolean;
+  /** Hasta 5 imágenes que se muestran a la derecha del texto de la entrada. */
+  imagenes?: string[];
+  /** Orden en la vitrina de bitácora (menor = primero; 1 es la primera). */
+  orden?: number;
 }
+
+export const POST_IMAGENES_MAX = 5;
 
 export type EstadoTaller = "proximo" | "en_curso" | "archivo";
 

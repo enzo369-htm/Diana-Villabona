@@ -38,6 +38,9 @@ export function filtrarPiezas(
 
 export function postsOrdenados(posts: Post[]): Post[] {
   return [...posts].sort((a, b) => {
+    const oa = a.orden ?? 9999;
+    const ob = b.orden ?? 9999;
+    if (oa !== ob) return oa - ob;
     const ta = a.fecha ? new Date(a.fecha).getTime() : 0;
     const tb = b.fecha ? new Date(b.fecha).getTime() : 0;
     if (tb !== ta) return tb - ta;

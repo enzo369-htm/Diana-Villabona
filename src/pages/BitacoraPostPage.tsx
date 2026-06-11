@@ -8,6 +8,7 @@ export function BitacoraPostPage() {
   const { posts } = useContent();
   const { id } = useParams<{ id: string }>();
   const post = id ? getPostById(posts, id) : undefined;
+  const imagenes = (post?.imagenes ?? []).filter((s) => s.trim() !== "");
 
   if (!post) {
     return (
@@ -46,12 +47,26 @@ export function BitacoraPostPage() {
         </div>
       ) : null}
 
-      <div
-        className="editorial__body"
-        dangerouslySetInnerHTML={{
-          __html: plainTextToSafeHtml(post.cuerpo),
-        }}
-      />
+      <div className="editorial__layout">
+        <div
+          className="editorial__body"
+          dangerouslySetInnerHTML={{
+            __html: plainTextToSafeHtml(post.cuerpo),
+          }}
+        />
+        {imagenes.length > 0 ? (
+          <aside className="editorial__gallery" aria-label="Imágenes de la entrada">
+            {imagenes.map((src, i) => (
+              <img
+                key={`${src}-${i}`}
+                src={src}
+                alt={`${post.titulo} — imagen ${i + 1}`}
+                loading="lazy"
+              />
+            ))}
+          </aside>
+        ) : null}
+      </div>
     </article>
   );
 }

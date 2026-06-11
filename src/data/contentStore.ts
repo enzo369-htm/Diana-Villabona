@@ -1,5 +1,5 @@
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
-import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
+import { OBRAS_PORTFOLIO_IMAGENES, POST_IMAGENES_MAX, TECNICAS_PIEZA } from "../types/content";
 
 const STORAGE_KEY = "dvc-cms-catalogo-v1";
 
@@ -43,6 +43,14 @@ export function normalizeStoredPost(raw: unknown): Post {
     typeof o.id === "string" && o.id.length > 0 ? o.id : `post-${Date.now()}`;
   const video =
     typeof o.videoUrl === "string" && o.videoUrl.trim() ? o.videoUrl.trim() : undefined;
+  const imagenes = Array.isArray(o.imagenes)
+    ? o.imagenes
+        .filter((x): x is string => typeof x === "string" && x.trim() !== "")
+        .map((x) => x.trim())
+        .slice(0, POST_IMAGENES_MAX)
+    : [];
+  const orden =
+    typeof o.orden === "number" && Number.isFinite(o.orden) ? o.orden : undefined;
   return {
     id,
     titulo: typeof o.titulo === "string" ? o.titulo : "",
@@ -51,6 +59,8 @@ export function normalizeStoredPost(raw: unknown): Post {
     fecha: typeof o.fecha === "string" ? o.fecha : "",
     cuerpo,
     destacado: Boolean(o.destacado),
+    imagenes,
+    ...(orden !== undefined ? { orden } : {}),
     ...(video ? { videoUrl: video } : {}),
   };
 }

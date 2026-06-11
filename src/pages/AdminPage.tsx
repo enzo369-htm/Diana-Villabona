@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useCallback, useRef, useState } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
-import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
+import { OBRAS_PORTFOLIO_IMAGENES, POST_IMAGENES_MAX, TECNICAS_PIEZA } from "../types/content";
 import { buildCatalog, useContent } from "../context/ContentContext";
 import {
   normalizeStoredObraPortfolio,
@@ -39,6 +39,7 @@ function newEmptyPost(): Post {
     fecha: "",
     cuerpo: "",
     destacado: false,
+    imagenes: [],
   };
 }
 
@@ -109,6 +110,7 @@ export function AdminPage() {
   const [tallerDraft, setTallerDraft] = useState<Taller | null>(null);
   const portadaFileRef = useRef<HTMLInputElement>(null);
   const piezaImagesFileRef = useRef<HTMLInputElement>(null);
+  const postImagesFileRef = useRef<HTMLInputElement>(null);
 
   const addPiezaImagesFromFiles = useCallback(
     async (files: FileList | null) => {
@@ -148,6 +150,52 @@ export function AdminPage() {
     [piezaDraft]
   );
 
+  const addPostImagesFromFiles = useCallback(
+    async (files: FileList | null) => {
+      if (!files?.length || !postDraft) return;
+
+      const current = postDraft.imagenes ?? [];
+      const room = POST_IMAGENES_MAX - current.length;
+      if (room <= 0) {
+        window.alert(`Máximo ${POST_IMAGENES_MAX} imágenes en la entrada.`);
+        if (postImagesFileRef.current) postImagesFileRef.current.value = "";
+        return;
+      }
+
+      const next = [...current];
+      for (const file of Array.from(files).slice(0, room)) {
+        if (file.size > IMAGE_MAX_SOURCE_BYTES) {
+          window.alert(
+            `"${file.name}" supera ~${IMAGE_MAX_SOURCE_MB} MB. Usa una imagen más liviana.`
+          );
+          continue;
+        }
+        try {
+          next.push(await resolveCmsImageFromFile(file));
+        } catch (err) {
+          window.alert(
+            err instanceof Error ? err.message : `No se pudo subir "${file.name}".`
+          );
+        }
+      }
+
+      setPostDraft({ ...postDraft, imagenes: next.slice(0, POST_IMAGENES_MAX) });
+      if (postImagesFileRef.current) postImagesFileRef.current.value = "";
+    },
+    [postDraft]
+  );
+
+  const removePostImage = useCallback(
+    (index: number) => {
+      if (!postDraft) return;
+      setPostDraft({
+        ...postDraft,
+        imagenes: (postDraft.imagenes ?? []).filter((_, i) => i !== index),
+      });
+    },
+    [postDraft]
+  );
+
   const savePieza = useCallback(() => {
     if (!piezaDraft) return;
     const imagenes = piezaDraft.imagenes.map((s) => s.trim()).filter(Boolean);
@@ -183,9 +231,16 @@ export function AdminPage() {
       fecha: postDraft.fecha,
       cuerpo: postDraft.cuerpo,
       destacado: postDraft.destacado,
+      imagenes: (postDraft.imagenes ?? [])
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .slice(0, POST_IMAGENES_MAX),
     };
     const v = postDraft.videoUrl?.trim();
     if (v) next.videoUrl = v;
+    if (typeof postDraft.orden === "number" && Number.isFinite(postDraft.orden)) {
+      next.orden = postDraft.orden;
+    }
     const idx = posts.findIndex((p) => p.id === next.id);
     if (idx >= 0) {
       const copy = [...posts];
@@ -844,6 +899,30 @@ export function AdminPage() {
                   />
                 </label>
                 <label className="admin-field">
+                  Orden en la vitrina
+                  <p className="admin-field__help">
+                    Número de posición: <code>1</code> es la primera entrada que
+                    se muestra, <code>2</code> la siguiente, y así. Si lo dejás
+                    vacío, se ordena por fecha (más reciente primero).
+                  </p>
+                  <input
+                    type="number"
+                    min={1}
+                    step={1}
+                    value={
+                      typeof postDraft.orden === "number" ? postDraft.orden : ""
+                    }
+                    onChange={(e) => {
+                      const raw = e.target.value.trim();
+                      setPostDraft({
+                        ...postDraft,
+                        orden: raw === "" ? undefined : Number(raw),
+                      });
+                    }}
+                    placeholder="1"
+                  />
+                </label>
+                <label className="admin-field">
                   URL de vídeo (YouTube/Vimeo, opcional)
                   <p className="admin-field__help">
                     Pegá el enlace normal del video (por ejemplo
@@ -875,6 +954,64 @@ export function AdminPage() {
                     placeholder="Escribe aquí el texto de la entrada."
                   />
                 </label>
+                <div className="admin-field">
+                  <span className="admin-field__label-text">
+                    Imágenes de la entrada (hasta {POST_IMAGENES_MAX})
+                  </span>
+                  <p className="admin-field__help">
+                    Se muestran a la derecha del texto en escritorio (una debajo
+                    de otra) y debajo del texto en móvil. {cmsImageHelpText()}
+                  </p>
+                  <div className="admin-portada-row">
+                    <label className="admin-file-label admin-file-label--inline">
+                      Elegir imágenes…
+                      <input
+                        ref={postImagesFileRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        multiple
+                        className="admin-file-input"
+                        disabled={(postDraft.imagenes?.length ?? 0) >= POST_IMAGENES_MAX}
+                        onChange={(e) => {
+                          void addPostImagesFromFiles(e.target.files);
+                        }}
+                      />
+                    </label>
+                    {(postDraft.imagenes?.length ?? 0) > 0 ? (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn--secondary"
+                        onClick={() => {
+                          setPostDraft({ ...postDraft, imagenes: [] });
+                          if (postImagesFileRef.current) {
+                            postImagesFileRef.current.value = "";
+                          }
+                        }}
+                      >
+                        Quitar todas
+                      </button>
+                    ) : null}
+                  </div>
+                  {(postDraft.imagenes?.length ?? 0) > 0 ? (
+                    <ul className="admin-imagenes-grid" role="list">
+                      {(postDraft.imagenes ?? []).map((src, index) => (
+                        <li
+                          key={`${src.slice(0, 48)}-${index}`}
+                          className="admin-imagenes-thumb"
+                        >
+                          <img src={src} alt="" />
+                          <button
+                            type="button"
+                            className="admin-imagenes-thumb__remove"
+                            onClick={() => removePostImage(index)}
+                          >
+                            Quitar
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
                 <label className="admin-field admin-field--inline">
                   <input
                     type="checkbox"

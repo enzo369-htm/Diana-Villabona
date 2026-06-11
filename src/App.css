@@ -3099,10 +3099,39 @@ article.page-content.page-content--pad.editorial {
   border: 0;
 }
 
+.editorial__layout {
+  display: grid;
+  gap: 1.75rem;
+}
+
 .editorial__body {
   font-size: 1.05rem;
   line-height: 1.75;
-  max-width: 42rem;
+}
+
+.editorial__gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.editorial__gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* Mobile: el cuerpo va primero y las imágenes debajo, al terminar el texto. */
+@media (min-width: 860px) {
+  .editorial__layout {
+    grid-template-columns: minmax(0, 1fr) clamp(260px, 32%, 360px);
+    align-items: start;
+    gap: 2.5rem;
+  }
+  .editorial__body {
+    max-width: 42rem;
+  }
 }
 
 .editorial__body h2 {
