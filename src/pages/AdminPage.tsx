@@ -9,7 +9,7 @@ import {
   normalizeStoredPost,
   normalizeStoredTaller,
 } from "../data/contentStore";
-import { IMAGE_MAX_BYTES, IMAGE_MAX_MB } from "../data/remoteCms";
+import { IMAGE_MAX_SOURCE_BYTES, IMAGE_MAX_SOURCE_MB } from "../data/remoteCms";
 import { cmsImageHelpText, resolveCmsImageFromFile } from "../utils/cmsImage";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
 import { AdminTalleresTab } from "./AdminTalleresTab";
@@ -45,7 +45,8 @@ function newEmptyPost(): Post {
 function cmsSyncLabel(
   state: string,
   usesCloud: boolean,
-  error: string | null
+  error: string | null,
+  dirty: boolean
 ): string {
   if (!usesCloud) {
     return import.meta.env.PROD
@@ -55,17 +56,26 @@ function cmsSyncLabel(
   switch (state) {
     case "loading":
       return "Cargando desde la nube…";
+    case "saving":
+      return "Guardando…";
     case "synced":
-      return "Sincronizado en la nube";
+      return dirty ? "● Cambios sin guardar" : "Guardado en la nube ✓";
     case "error":
       return error
-        ? `Error de nube: ${error}`
+        ? `Error al guardar: ${error}`
         : "No se pudo conectar con la nube — revisá Supabase en Vercel";
     case "local":
       return "Datos locales pendientes de subir a la nube";
     default:
-      return "";
+      return dirty ? "● Cambios sin guardar" : "";
   }
+}
+
+function cmsSyncTone(state: string, dirty: boolean): string {
+  if (state === "error") return "admin-sync--error";
+  if (state === "saving" || state === "loading") return "admin-sync--busy";
+  if (dirty) return "admin-sync--dirty";
+  return "admin-sync--ok";
 }
 
 export function AdminPage() {
@@ -74,16 +84,20 @@ export function AdminPage() {
     posts,
     obrasPortfolio,
     talleres,
+    deletedIds,
     cmsSyncState,
     cmsSyncError,
+    cmsDirty,
     cmsUsesCloud,
     setPiezas,
     setPosts,
     setObrasPortfolio,
     setTalleres,
+    recordDeletion,
     resetToSeed,
     pushCatalogToCloud,
     persistCatalog,
+    retrySave,
   } = useContent();
   const [savingObra, setSavingObra] = useState(false);
   const [tab, setTab] = useState<
@@ -102,9 +116,9 @@ export function AdminPage() {
 
       const next = [...piezaDraft.imagenes];
       for (const file of Array.from(files)) {
-        if (file.size > IMAGE_MAX_BYTES) {
+        if (file.size > IMAGE_MAX_SOURCE_BYTES) {
           window.alert(
-            `"${file.name}" supera ~${IMAGE_MAX_MB} MB. Comprímela o usa otra imagen.`
+            `"${file.name}" supera ~${IMAGE_MAX_SOURCE_MB} MB. Usa una imagen más liviana.`
           );
           continue;
         }
@@ -154,9 +168,10 @@ export function AdminPage() {
 
   const deletePieza = useCallback(() => {
     if (!piezaDraft || !window.confirm("¿Eliminar esta pieza del catálogo?")) return;
+    recordDeletion(piezaDraft.id);
     setPiezas(piezas.filter((p) => p.id !== piezaDraft.id));
     setPiezaDraft(null);
-  }, [piezaDraft, piezas, setPiezas]);
+  }, [piezaDraft, piezas, setPiezas, recordDeletion]);
 
   const savePost = useCallback(() => {
     if (!postDraft) return;
@@ -183,9 +198,10 @@ export function AdminPage() {
 
   const deletePost = useCallback(() => {
     if (!postDraft || !window.confirm("¿Eliminar esta entrada?")) return;
+    recordDeletion(postDraft.id);
     setPosts(posts.filter((p) => p.id !== postDraft.id));
     setPostDraft(null);
-  }, [postDraft, posts, setPosts]);
+  }, [postDraft, posts, setPosts, recordDeletion]);
 
   const saveObra = useCallback(async () => {
     if (!obraDraft || savingObra) return;
@@ -205,20 +221,15 @@ export function AdminPage() {
         ? obrasPortfolio.map((o, i) => (i === idx ? next : o))
         : [...obrasPortfolio, next];
 
-    const catalog = buildCatalog(piezas, posts, nextObras, talleres);
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres, deletedIds);
 
     setSavingObra(true);
     try {
       setObrasPortfolio(nextObras);
       await persistCatalog(catalog);
       setObraDraft(next);
-      window.alert("Obra guardada correctamente.");
-    } catch (err) {
-      window.alert(
-        err instanceof Error
-          ? err.message
-          : "No se pudo guardar la obra. Intentá de nuevo."
-      );
+    } catch {
+      /* el banner de estado muestra el error y permite reintentar */
     } finally {
       setSavingObra(false);
     }
@@ -228,6 +239,7 @@ export function AdminPage() {
     piezas,
     posts,
     talleres,
+    deletedIds,
     persistCatalog,
     savingObra,
     setObrasPortfolio,
@@ -239,22 +251,21 @@ export function AdminPage() {
 
     const removed = obraDraft;
     const nextObras = obrasPortfolio.filter((o) => o.id !== obraDraft.id);
-    const catalog = buildCatalog(piezas, posts, nextObras, talleres);
+    const nextDeleted = deletedIds.includes(removed.id)
+      ? deletedIds
+      : [...deletedIds, removed.id];
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres, nextDeleted);
 
     setSavingObra(true);
     try {
+      recordDeletion(removed.id);
       setObrasPortfolio(nextObras);
       setObraDraft(null);
       await persistCatalog(catalog);
-      window.alert("Obra eliminada correctamente.");
-    } catch (err) {
+    } catch {
       setObrasPortfolio(obrasPortfolio);
       setObraDraft(removed);
-      window.alert(
-        err instanceof Error
-          ? err.message
-          : "No se pudo eliminar la obra. Intentá de nuevo."
-      );
+      /* el banner de estado muestra el error y permite reintentar */
     } finally {
       setSavingObra(false);
     }
@@ -264,6 +275,8 @@ export function AdminPage() {
     piezas,
     posts,
     talleres,
+    deletedIds,
+    recordDeletion,
     persistCatalog,
     savingObra,
     setObrasPortfolio,
@@ -294,23 +307,30 @@ export function AdminPage() {
 
   const deleteTaller = useCallback(() => {
     if (!tallerDraft || !window.confirm("¿Eliminar este taller?")) return;
+    recordDeletion(tallerDraft.id);
     setTalleres(talleres.filter((t) => t.id !== tallerDraft.id));
     setTallerDraft(null);
-  }, [tallerDraft, talleres, setTalleres]);
+  }, [tallerDraft, talleres, setTalleres, recordDeletion]);
 
   const exportJson = useCallback(() => {
     const blob = new Blob(
-      [JSON.stringify({ piezas, posts, obrasPortfolio, talleres }, null, 2)],
+      [
+        JSON.stringify(
+          { piezas, posts, obrasPortfolio, talleres, deletedIds },
+          null,
+          2
+        ),
+      ],
       {
-      type: "application/json",
-    }
+        type: "application/json",
+      }
     );
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = "diana-villabona-catalogo-bitacora.json";
     a.click();
     URL.revokeObjectURL(a.href);
-  }, [piezas, posts, obrasPortfolio, talleres]);
+  }, [piezas, posts, obrasPortfolio, talleres, deletedIds]);
 
   const importJson = useCallback(
     (file: File | null) => {
@@ -359,9 +379,24 @@ export function AdminPage() {
           Edición del catálogo, portafolio, encuentros y bitácora. Los cambios y las fotos
           quedan guardados para todo el sitio (celular y computadora).
         </p>
-        <p className="admin-sync-status" role="status">
-          {cmsSyncLabel(cmsSyncState, cmsUsesCloud, cmsSyncError)}
-        </p>
+        <div
+          className={`admin-sync-status ${cmsSyncTone(cmsSyncState, cmsDirty)}`}
+          role="status"
+          aria-live="polite"
+        >
+          <span>{cmsSyncLabel(cmsSyncState, cmsUsesCloud, cmsSyncError, cmsDirty)}</span>
+          {cmsUsesCloud && cmsSyncState === "error" ? (
+            <button
+              type="button"
+              className="admin-btn admin-btn--secondary admin-sync-status__retry"
+              onClick={() => {
+                void retrySave();
+              }}
+            >
+              Reintentar
+            </button>
+          ) : null}
+        </div>
       </header>
 
       <div className="admin-toolbar" role="group" aria-label="Acciones globales">
@@ -747,9 +782,9 @@ export function AdminPage() {
                         onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (!file || !postDraft) return;
-                          if (file.size > IMAGE_MAX_BYTES) {
+                          if (file.size > IMAGE_MAX_SOURCE_BYTES) {
                             window.alert(
-                              `La imagen supera ~${IMAGE_MAX_MB} MB. Comprímela o coloca el archivo en public/ y usa la ruta.`
+                              `La imagen supera ~${IMAGE_MAX_SOURCE_MB} MB. Usa una imagen más liviana.`
                             );
                             e.target.value = "";
                             return;

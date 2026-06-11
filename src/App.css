@@ -3722,11 +3722,47 @@ article.page-content.page-content--pad.editorial {
 }
 
 .admin-sync-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
   margin: 0.65rem 0 0;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.6rem;
   font-size: 0.78rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--ink-muted);
+  border: 1px solid transparent;
+}
+
+.admin-sync--ok {
+  color: #1b6b3a;
+  background: rgba(38, 160, 85, 0.1);
+  border-color: rgba(38, 160, 85, 0.25);
+}
+
+.admin-sync--busy {
+  color: #7a5a12;
+  background: rgba(214, 158, 46, 0.12);
+  border-color: rgba(214, 158, 46, 0.28);
+}
+
+.admin-sync--dirty {
+  color: #8a5a00;
+  background: rgba(230, 160, 30, 0.14);
+  border-color: rgba(230, 160, 30, 0.3);
+}
+
+.admin-sync--error {
+  color: #9a2a2a;
+  background: rgba(200, 60, 60, 0.1);
+  border-color: rgba(200, 60, 60, 0.3);
+}
+
+.admin-sync-status__retry {
+  margin: 0;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.72rem;
 }
 
 .admin-field--tight {

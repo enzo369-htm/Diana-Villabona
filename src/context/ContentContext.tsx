@@ -28,24 +28,34 @@ import {
   saveRemoteCatalog,
 } from "../data/remoteCms";
 
-export type CmsSyncState = "idle" | "loading" | "synced" | "local" | "error";
+export type CmsSyncState =
+  | "idle"
+  | "loading"
+  | "saving"
+  | "synced"
+  | "local"
+  | "error";
 
 export type ContentContextValue = {
   piezas: Pieza[];
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
   talleres: Taller[];
+  deletedIds: string[];
   cmsReady: boolean;
   cmsSyncState: CmsSyncState;
   cmsSyncError: string | null;
+  cmsDirty: boolean;
   cmsUsesCloud: boolean;
   setPiezas: React.Dispatch<React.SetStateAction<Pieza[]>>;
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   setObrasPortfolio: React.Dispatch<React.SetStateAction<ObraPortfolio[]>>;
   setTalleres: React.Dispatch<React.SetStateAction<Taller[]>>;
+  recordDeletion: (id: string) => void;
   resetToSeed: () => Promise<void>;
   pushCatalogToCloud: (catalog?: StoredCms) => Promise<void>;
   persistCatalog: (catalog: StoredCms) => Promise<void>;
+  retrySave: () => Promise<void>;
 };
 
 const ContentContext = createContext<ContentContextValue | null>(null);
@@ -70,9 +80,10 @@ export function buildCatalog(
   piezas: Pieza[],
   posts: Post[],
   obrasPortfolio: ObraPortfolio[],
-  talleres: Taller[]
+  talleres: Taller[],
+  deletedIds: string[] = []
 ): StoredCms {
-  return { piezas, posts, obrasPortfolio, talleres };
+  return { piezas, posts, obrasPortfolio, talleres, deletedIds };
 }
 
 export function ContentProvider({ children }: { children: ReactNode }) {
@@ -82,7 +93,9 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     usesCloud ? "loading" : "local"
   );
   const [cmsSyncError, setCmsSyncError] = useState<string | null>(null);
+  const [cmsDirty, setCmsDirty] = useState(false);
   const hydrated = useRef(false);
+  const skipNextAutosave = useRef(false);
 
   const [piezas, setPiezas] = useState<Pieza[]>(cloneSeedPiezas);
   const [posts, setPosts] = useState<Post[]>(cloneSeedPosts);
@@ -90,19 +103,61 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     cloneSeedObrasPortfolio
   );
   const [talleres, setTalleres] = useState<Taller[]>(cloneSeedTalleres);
+  const [deletedIds, setDeletedIds] = useState<string[]>([]);
 
   const applyStored = useCallback((stored: StoredCms | null) => {
-    setPiezas(mergePiezasWithSeed(stored?.piezas ?? null, cloneSeedPiezas()));
-    setPosts(mergePostsWithSeed(stored?.posts ?? null, cloneSeedPosts()));
+    const deleted = new Set(stored?.deletedIds ?? []);
+    setDeletedIds(stored?.deletedIds ?? []);
+    setPiezas(
+      mergePiezasWithSeed(stored?.piezas ?? null, cloneSeedPiezas(), deleted)
+    );
+    setPosts(
+      mergePostsWithSeed(stored?.posts ?? null, cloneSeedPosts(), deleted)
+    );
     setObrasPortfolio(
       mergeObrasPortfolioWithSeed(
         stored?.obrasPortfolio ?? null,
-        cloneSeedObrasPortfolio()
+        cloneSeedObrasPortfolio(),
+        deleted
       )
     );
     setTalleres(
-      mergeTalleresWithSeed(stored?.talleres ?? null, cloneSeedTalleres())
+      mergeTalleresWithSeed(stored?.talleres ?? null, cloneSeedTalleres(), deleted)
     );
+  }, []);
+
+  // --- Cola de guardado serializada (evita race conditions y peticiones cruzadas) ---
+  const saveChainRef = useRef<Promise<void>>(Promise.resolve());
+  const latestCatalogRef = useRef<StoredCms | null>(null);
+
+  const queueSave = useCallback((catalog: StoredCms): Promise<void> => {
+    latestCatalogRef.current = catalog;
+    setCmsDirty(true);
+
+    const run = saveChainRef.current.then(async () => {
+      const toSave = latestCatalogRef.current;
+      if (!toSave) return; // ya fue cubierto por un guardado posterior
+      latestCatalogRef.current = null;
+
+      setCmsSyncState("saving");
+      try {
+        await saveRemoteCatalog(toSave);
+        setCmsSyncError(null);
+        if (!latestCatalogRef.current) {
+          setCmsDirty(false);
+          setCmsSyncState("synced");
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Error al guardar";
+        setCmsSyncError(message);
+        setCmsSyncState("error");
+        throw err;
+      }
+    });
+
+    saveChainRef.current = run.catch(() => {});
+    return run;
   }, []);
 
   const pushCatalogToCloud = useCallback(
@@ -110,18 +165,16 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       if (!usesCloud) return;
       const payload =
         catalog ??
-        buildCatalog(piezas, posts, obrasPortfolio, talleres);
-      await saveRemoteCatalog(payload);
-      setCmsSyncError(null);
-      setCmsSyncState("synced");
+        buildCatalog(piezas, posts, obrasPortfolio, talleres, deletedIds);
+      await queueSave(payload);
     },
-    [piezas, posts, obrasPortfolio, talleres, usesCloud]
+    [piezas, posts, obrasPortfolio, talleres, deletedIds, usesCloud, queueSave]
   );
 
   const persistCatalog = useCallback(
     async (catalog: StoredCms) => {
       if (usesCloud) {
-        await pushCatalogToCloud(catalog);
+        await queueSave(catalog);
         return;
       }
       if (!saveCms(catalog)) {
@@ -129,10 +182,27 @@ export function ContentProvider({ children }: { children: ReactNode }) {
           "No se pudo guardar en este navegador (almacenamiento lleno)."
         );
       }
+      setCmsDirty(false);
       setCmsSyncState("local");
     },
-    [pushCatalogToCloud, usesCloud]
+    [usesCloud, queueSave]
   );
+
+  const retrySave = useCallback(async () => {
+    const catalog = buildCatalog(
+      piezas,
+      posts,
+      obrasPortfolio,
+      talleres,
+      deletedIds
+    );
+    await persistCatalog(catalog);
+  }, [piezas, posts, obrasPortfolio, talleres, deletedIds, persistCatalog]);
+
+  const recordDeletion = useCallback((id: string) => {
+    if (!id) return;
+    setDeletedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -140,6 +210,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     async function hydrate() {
       if (!usesCloud) {
         applyStored(loadCms());
+        skipNextAutosave.current = true;
         hydrated.current = true;
         setCmsReady(true);
         setCmsSyncState("local");
@@ -151,18 +222,12 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         const remote = await fetchRemoteCatalog();
         if (cancelled) return;
 
-        if (remote) {
-          clearCms();
-          applyStored(remote);
-          saveCms(remote);
-          setCmsSyncError(null);
-          setCmsSyncState("synced");
-        } else {
-          clearCms();
-          applyStored(null);
-          setCmsSyncError(null);
-          setCmsSyncState("synced");
-        }
+        clearCms();
+        applyStored(remote);
+        if (remote) saveCms(remote);
+        setCmsSyncError(null);
+        setCmsDirty(false);
+        setCmsSyncState("synced");
       } catch (err) {
         console.warn("[CMS] No se pudo cargar desde la nube:", err);
         if (!cancelled) {
@@ -174,6 +239,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
         }
       } finally {
         if (!cancelled) {
+          skipNextAutosave.current = true;
           hydrated.current = true;
           setCmsReady(true);
         }
@@ -189,7 +255,19 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!cmsReady || !hydrated.current) return;
 
-    const catalog = buildCatalog(piezas, posts, obrasPortfolio, talleres);
+    // Ignorar el primer ciclo tras hidratar (no es una edición de la clienta).
+    if (skipNextAutosave.current) {
+      skipNextAutosave.current = false;
+      return;
+    }
+
+    const catalog = buildCatalog(
+      piezas,
+      posts,
+      obrasPortfolio,
+      talleres,
+      deletedIds
+    );
 
     if (!usesCloud) {
       if (!saveCms(catalog)) {
@@ -203,23 +281,24 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    setCmsDirty(true);
     const timer = window.setTimeout(() => {
-      void saveRemoteCatalog(catalog)
-        .then(() => {
-          setCmsSyncError(null);
-          setCmsSyncState("synced");
-        })
-        .catch((err) => {
-          console.error("[CMS] Error al sincronizar:", err);
-          setCmsSyncError(
-            err instanceof Error ? err.message : "Error al sincronizar"
-          );
-          setCmsSyncState("error");
-        });
+      void queueSave(catalog).catch(() => {
+        /* el estado de error ya se reflejó en el contexto */
+      });
     }, 700);
 
     return () => window.clearTimeout(timer);
-  }, [piezas, posts, obrasPortfolio, talleres, cmsReady, usesCloud]);
+  }, [
+    piezas,
+    posts,
+    obrasPortfolio,
+    talleres,
+    deletedIds,
+    cmsReady,
+    usesCloud,
+    queueSave,
+  ]);
 
   const resetToSeed = useCallback(async () => {
     clearCms();
@@ -227,12 +306,14 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       cloneSeedPiezas(),
       cloneSeedPosts(),
       cloneSeedObrasPortfolio(),
-      cloneSeedTalleres()
+      cloneSeedTalleres(),
+      []
     );
     setPiezas(seedCatalog.piezas);
     setPosts(seedCatalog.posts);
     setObrasPortfolio(seedCatalog.obrasPortfolio);
     setTalleres(seedCatalog.talleres);
+    setDeletedIds([]);
     await persistCatalog(seedCatalog);
   }, [persistCatalog]);
 
@@ -242,30 +323,38 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      deletedIds,
       cmsReady,
       cmsSyncState,
       cmsSyncError,
+      cmsDirty,
       cmsUsesCloud: usesCloud,
       setPiezas,
       setPosts,
       setObrasPortfolio,
       setTalleres,
+      recordDeletion,
       resetToSeed,
       pushCatalogToCloud,
       persistCatalog,
+      retrySave,
     }),
     [
       piezas,
       posts,
       obrasPortfolio,
       talleres,
+      deletedIds,
       cmsReady,
       cmsSyncState,
       cmsSyncError,
+      cmsDirty,
       usesCloud,
+      recordDeletion,
       resetToSeed,
       pushCatalogToCloud,
       persistCatalog,
+      retrySave,
     ]
   );
 

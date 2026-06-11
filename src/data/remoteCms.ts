@@ -5,6 +5,7 @@ import {
   isRemoteCmsEnabled,
 } from "../lib/supabaseClient";
 import {
+  normalizeDeletedIds,
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
   normalizeStoredTaller,
@@ -16,6 +17,9 @@ export { isRemoteCmsEnabled };
 const CATALOG_ID = "main";
 export const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 export const IMAGE_MAX_MB = IMAGE_MAX_BYTES / (1024 * 1024);
+/** Tope del archivo original antes de comprimir (la compresión suele dejarlo muy por debajo). */
+export const IMAGE_MAX_SOURCE_BYTES = 30 * 1024 * 1024;
+export const IMAGE_MAX_SOURCE_MB = IMAGE_MAX_SOURCE_BYTES / (1024 * 1024);
 
 function normalizeRemotePayload(raw: unknown): StoredCms | null {
   if (!raw || typeof raw !== "object") return null;
@@ -30,6 +34,9 @@ function normalizeRemotePayload(raw: unknown): StoredCms | null {
     talleres: Array.isArray(data.talleres)
       ? data.talleres.map(normalizeStoredTaller)
       : [],
+    deletedIds: normalizeDeletedIds(
+      (data as { deletedIds?: unknown }).deletedIds
+    ),
   };
 }
 

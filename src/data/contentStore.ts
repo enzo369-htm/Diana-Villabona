@@ -8,6 +8,8 @@ export type StoredCms = {
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
   talleres: Taller[];
+  /** IDs de entradas (incluidas las del seed) que la clienta eliminó. */
+  deletedIds: string[];
 };
 
 /** Migra entradas guardadas con el campo antiguo `cuerpoHtml` (HTML → texto). */
@@ -120,10 +122,18 @@ export function loadCms(): StoredCms | null {
       talleres: Array.isArray(data.talleres)
         ? data.talleres.map(normalizeStoredTaller)
         : [],
+      deletedIds: normalizeDeletedIds(
+        (data as { deletedIds?: unknown }).deletedIds
+      ),
     };
   } catch {
     return null;
   }
+}
+
+export function normalizeDeletedIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((x): x is string => typeof x === "string" && x.length > 0);
 }
 
 /** Guarda en localStorage. Devuelve false si falla (p. ej. almacenamiento lleno). */
@@ -191,40 +201,54 @@ function normalizeStoredPieza(raw: unknown): Pieza {
   };
 }
 
+const NO_DELETED = new Set<string>();
+
 /** El seed es la base; el CMS puede editar existentes y añadir piezas nuevas. */
-export function mergePiezasWithSeed(stored: Pieza[] | null, seed: Pieza[]): Pieza[] {
-  if (!stored) return seed;
+export function mergePiezasWithSeed(
+  stored: Pieza[] | null,
+  seed: Pieza[],
+  deletedIds: Set<string> = NO_DELETED
+): Pieza[] {
+  if (!stored) return seed.filter((s) => !deletedIds.has(s.id));
   const storedById = new Map(
     stored.map((p) => [p.id, normalizeStoredPieza(p)])
   );
   const seedIds = new Set(seed.map((s) => s.id));
 
-  const merged = seed.map((s) => {
-    const override = storedById.get(s.id);
-    return override
-      ? normalizeStoredPieza({ ...s, ...override, id: s.id })
-      : s;
-  });
+  const merged = seed
+    .filter((s) => !deletedIds.has(s.id))
+    .map((s) => {
+      const override = storedById.get(s.id);
+      return override
+        ? normalizeStoredPieza({ ...s, ...override, id: s.id })
+        : s;
+    });
 
   const extras = stored
-    .filter((p) => p.id && !seedIds.has(p.id))
+    .filter((p) => p.id && !seedIds.has(p.id) && !deletedIds.has(p.id))
     .map(normalizeStoredPieza);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }
 
 /** El seed es la base; el CMS puede editar existentes y añadir entradas nuevas. */
-export function mergePostsWithSeed(stored: Post[] | null, seed: Post[]): Post[] {
-  if (!stored) return seed;
+export function mergePostsWithSeed(
+  stored: Post[] | null,
+  seed: Post[],
+  deletedIds: Set<string> = NO_DELETED
+): Post[] {
+  if (!stored) return seed.filter((s) => !deletedIds.has(s.id));
   const storedById = new Map(stored.map((p) => [p.id, p]));
   const seedIds = new Set(seed.map((s) => s.id));
 
-  const merged = seed.map((s) => {
-    const override = storedById.get(s.id);
-    return override ? normalizeStoredPost({ ...s, ...override, id: s.id }) : s;
-  });
+  const merged = seed
+    .filter((s) => !deletedIds.has(s.id))
+    .map((s) => {
+      const override = storedById.get(s.id);
+      return override ? normalizeStoredPost({ ...s, ...override, id: s.id }) : s;
+    });
 
   const extras = stored
-    .filter((p) => p.id && !seedIds.has(p.id))
+    .filter((p) => p.id && !seedIds.has(p.id) && !deletedIds.has(p.id))
     .map(normalizeStoredPost);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }
@@ -232,21 +256,24 @@ export function mergePostsWithSeed(stored: Post[] | null, seed: Post[]): Post[] 
 /** El seed es la base; el CMS puede editar existentes y añadir obras nuevas. */
 export function mergeObrasPortfolioWithSeed(
   stored: ObraPortfolio[] | null,
-  seed: ObraPortfolio[]
+  seed: ObraPortfolio[],
+  deletedIds: Set<string> = NO_DELETED
 ): ObraPortfolio[] {
-  if (!stored) return seed;
+  if (!stored) return seed.filter((s) => !deletedIds.has(s.id));
   const storedById = new Map(stored.map((o) => [o.id, o]));
   const seedIds = new Set(seed.map((s) => s.id));
 
-  const merged = seed.map((s) => {
-    const override = storedById.get(s.id);
-    return override
-      ? normalizeStoredObraPortfolio({ ...s, ...override, id: s.id })
-      : s;
-  });
+  const merged = seed
+    .filter((s) => !deletedIds.has(s.id))
+    .map((s) => {
+      const override = storedById.get(s.id);
+      return override
+        ? normalizeStoredObraPortfolio({ ...s, ...override, id: s.id })
+        : s;
+    });
 
   const extras = stored
-    .filter((o) => o.id && !seedIds.has(o.id))
+    .filter((o) => o.id && !seedIds.has(o.id) && !deletedIds.has(o.id))
     .map(normalizeStoredObraPortfolio);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }
@@ -254,21 +281,24 @@ export function mergeObrasPortfolioWithSeed(
 /** El seed es la base; el CMS puede editar existentes y añadir talleres nuevos. */
 export function mergeTalleresWithSeed(
   stored: Taller[] | null,
-  seed: Taller[]
+  seed: Taller[],
+  deletedIds: Set<string> = NO_DELETED
 ): Taller[] {
-  if (!stored) return seed;
+  if (!stored) return seed.filter((s) => !deletedIds.has(s.id));
   const storedById = new Map(stored.map((t) => [t.id, t]));
   const seedIds = new Set(seed.map((s) => s.id));
 
-  const merged = seed.map((s) => {
-    const override = storedById.get(s.id);
-    return override
-      ? normalizeStoredTaller({ ...s, ...override, id: s.id })
-      : s;
-  });
+  const merged = seed
+    .filter((s) => !deletedIds.has(s.id))
+    .map((s) => {
+      const override = storedById.get(s.id);
+      return override
+        ? normalizeStoredTaller({ ...s, ...override, id: s.id })
+        : s;
+    });
 
   const extras = stored
-    .filter((t) => t.id && !seedIds.has(t.id))
+    .filter((t) => t.id && !seedIds.has(t.id) && !deletedIds.has(t.id))
     .map(normalizeStoredTaller);
   return extras.length > 0 ? [...merged, ...extras] : merged;
 }

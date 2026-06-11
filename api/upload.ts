@@ -1,6 +1,4 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { assertAdminAuth } from "./lib/supabaseAdmin";
-import { publicMediaUrl, uploadMediaBuffer } from "./lib/supabaseRest";
 
 /** Ruta legacy (base64). Preferir /api/upload-sign + subida directa a Supabase. */
 const MAX_BYTES = 10 * 1024 * 1024;
@@ -10,6 +8,24 @@ const ALLOWED_TYPES = new Set([
   "image/webp",
   "image/gif",
 ]);
+
+function assertAdminAuth(authHeader: string | undefined): boolean {
+  const secret = process.env.CMS_ADMIN_SECRET?.trim();
+  if (!secret) return false;
+  const token = authHeader?.startsWith("Bearer ")
+    ? authHeader.slice(7).trim()
+    : "";
+  return token.length > 0 && token === secret;
+}
+
+function getSupabaseConfig(): { url: string; key: string } {
+  const url = process.env.SUPABASE_URL?.trim();
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!url || !key) {
+    throw new Error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el servidor.");
+  }
+  return { url: url.replace(/\/$/, ""), key };
+}
 
 function sanitizeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "imagen";
@@ -42,7 +58,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!base64) {
       return res.status(400).json({ error: "Falta el archivo" });
     }
-
     if (!ALLOWED_TYPES.has(contentType)) {
       return res.status(400).json({ error: "Tipo de imagen no permitido" });
     }
@@ -55,9 +70,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const path = `uploads/${Date.now()}-${filename}`;
-    await uploadMediaBuffer(path, buffer, contentType);
+    const { url, key } = getSupabaseConfig();
 
-    return res.status(200).json({ url: publicMediaUrl(path) });
+    const uploadRes = await fetch(
+      `${url}/storage/v1/object/cms-media/${path}`,
+      {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": contentType,
+          "x-upsert": "false",
+        },
+        body: buffer,
+      }
+    );
+
+    if (!uploadRes.ok) {
+      const detail = await uploadRes.text().catch(() => "");
+      return res
+        .status(500)
+        .json({ error: detail || `Storage respondió ${uploadRes.status}` });
+    }
+
+    const publicUrl = `${url}/storage/v1/object/public/cms-media/${path}`;
+    return res.status(200).json({ url: publicUrl });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error interno";
     return res.status(500).json({ error: message });
