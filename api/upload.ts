@@ -23,12 +23,18 @@ function assertAdminAuth(authHeader: string | undefined): boolean {
 }
 
 function getSupabaseConfig(): { url: string; key: string } {
-  const url = clean(process.env.SUPABASE_URL);
+  const rawUrl = clean(process.env.SUPABASE_URL);
   const key = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-  if (!url || !key) {
+  if (!rawUrl || !key) {
     throw new Error("Faltan SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en el servidor.");
   }
-  return { url: url.replace(/\/$/, ""), key };
+  let url = rawUrl.replace(/\/+$/, "");
+  try {
+    url = new URL(rawUrl).origin;
+  } catch {
+    /* si no parsea, se usa la versión saneada */
+  }
+  return { url, key };
 }
 
 function sanitizeFilename(name: string): string {
