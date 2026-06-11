@@ -3597,7 +3597,9 @@ article.page-content.page-content--pad.editorial {
 }
 
 .sobre-mi__cta {
-  margin-top: clamp(1.5rem, 3vw, 2rem);
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  display: flex;
+  justify-content: flex-end;
 }
 
 /* —— Admin —— */
