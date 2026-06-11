@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
 import { OBRAS_PORTFOLIO_IMAGENES, TECNICAS_PIEZA } from "../types/content";
@@ -9,7 +9,6 @@ import {
   normalizeStoredPost,
   normalizeStoredTaller,
 } from "../data/contentStore";
-import { getAdminPassphrase, setAdminSession } from "../lib/adminAuth";
 import { IMAGE_MAX_BYTES } from "../data/remoteCms";
 import { cmsImageHelpText, resolveCmsImageFromFile } from "../utils/cmsImage";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
@@ -83,13 +82,6 @@ export function AdminPage() {
   const [tallerDraft, setTallerDraft] = useState<Taller | null>(null);
   const portadaFileRef = useRef<HTMLInputElement>(null);
   const piezaImagesFileRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    const envPass = import.meta.env.VITE_ADMIN_PASSPHRASE?.trim();
-    if (!getAdminPassphrase() && envPass) {
-      setAdminSession(envPass);
-    }
-  }, []);
 
   const addPiezaImagesFromFiles = useCallback(
     async (files: FileList | null) => {
