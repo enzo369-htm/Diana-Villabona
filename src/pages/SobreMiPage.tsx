@@ -1,4 +1,5 @@
 import { IMAGES } from "../images";
+import { CONTACT_EMAIL } from "../siteConfig";
 
 export function SobreMiPage() {
   return (
@@ -51,6 +52,14 @@ export function SobreMiPage() {
             oportunidad para compartir conocimientos, intercambiar experiencias y
             seguir aprendiendo junto a otras personas.
           </p>
+          <div className="sobre-mi__cta">
+            <a
+              className="btn-pill btn-pill--accent"
+              href={`mailto:${CONTACT_EMAIL}`}
+            >
+              ¿Hablamos?
+            </a>
+          </div>
         </div>
       </div>
     </div>

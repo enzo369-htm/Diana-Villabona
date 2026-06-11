@@ -3596,6 +3596,10 @@ article.page-content.page-content--pad.editorial {
   margin-bottom: 0;
 }
 
+.sobre-mi__cta {
+  margin-top: clamp(1.5rem, 3vw, 2rem);
+}
+
 /* —— Admin —— */
 .admin-hub .page-header__lede {
   max-width: 46rem;
