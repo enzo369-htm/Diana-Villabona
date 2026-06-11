@@ -825,6 +825,7 @@ a:hover {
   line-height: 1.65;
   text-align: left;
   color: var(--ink-muted);
+  white-space: pre-line;
 }
 
 .portfolio-obra__grid {

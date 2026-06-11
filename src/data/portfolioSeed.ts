@@ -1,151 +1,67 @@
 import { IMAGES } from "../images";
 import type { ObraPortfolio } from "../types/content";
 
-function img6(a: string, b: string, c: string, d: string, e: string, f: string): string[] {
-  return [a, b, c, d, e, f];
+/**
+ * IDs de obras antiguas que ya no se muestran. Se filtran tanto del seed como
+ * de lo guardado en la nube, así no reaparecen aunque sigan en Supabase.
+ */
+export const retiredObraIds: string[] = [
+  "pf-1",
+  "pf-2",
+  "pf-3",
+  "pf-4",
+  "pf-5",
+  "pf-6",
+  "pf-7",
+  "pf-8",
+  "pf-9",
+  "pf-10",
+];
+
+/** Una sola imagen de portada por obra; la clienta cargará el resto desde el admin. */
+function portada(src: string): string[] {
+  return [src, "", "", "", "", ""];
 }
 
 /** Obras iniciales del muestrario (rutas en /public). */
 export const obrasPortfolio: ObraPortfolio[] = [
   {
-    id: "pf-1",
-    titulo: "Craquelado y tormenta",
+    id: "pf-cenizas-bambu",
+    titulo: "Cenizas de Bambú",
     texto:
-      "Superficies que recogen la tensión del fuego rápido. Grietas como relámpagos sobre gres oscuro.",
-    imagenes: img6(
-      IMAGES.muestraTormentaCraquelado,
-      IMAGES.reveladoCopia,
-      IMAGES.hero5,
-      IMAGES.hero2,
-      IMAGES.muestraRakuSilencio,
-      IMAGES.barro
-    ),
+      "Este proyecto surgió a partir de una invitación para desarrollar unas piezas cerámicas para el encuentro del Laboratorio de Guadua, un espacio atravesado por el trabajo con bambú. Mi interés fue trasladar ese material a la cerámica y hacerlo presente desde su propia transformación.\n\nPara esta propuesta desarrollé esmaltes a partir de cenizas de bambú. El proceso inició con la quema, recolección y limpieza de las cenizas, seguido de múltiples pruebas hasta llegar a un esmalte que pudiera contener la huella del bambú dentro de la superficie cerámica.\n\nEste proyecto explora el diálogo entre la materia y cómo el barro puede convertirse en un espacio donde distintos lenguajes aparecen y se transforman.",
+    imagenes: portada(IMAGES.muestraFormulacionEsmaltes),
     orden: 1,
   },
   {
-    id: "pf-2",
-    titulo: "Saggar: huellas",
-    texto: "Materiales naturales envueltos en la pieza dejan trazos únicos en cada quema.",
-    imagenes: img6(
-      IMAGES.muestraSaggarHuella,
-      IMAGES.muestraFiqueRaiz,
-      IMAGES.hero6,
-      IMAGES.hero7,
-      IMAGES.muestraEnMuerte,
-      IMAGES.revelado
-    ),
+    id: "pf-piedras",
+    titulo: "Piedras",
+    texto:
+      "Siempre pienso en las piedras. En su silencio sostienen el tiempo. Es como si lo vieran todo morir y nacer, una y otra vez.",
+    imagenes: portada(IMAGES.barro),
     orden: 2,
   },
   {
-    id: "pf-3",
-    titulo: "Esmaltes en el estudio",
-    texto: "Capas de color que dialogan con la luz lateral del taller.",
-    imagenes: img6(
-      IMAGES.muestraEsmaltesSala,
-      IMAGES.muestraFormulacionEsmaltes,
-      IMAGES.hero,
-      IMAGES.hero3,
-      IMAGES.hero4,
-      IMAGES.podcast
-    ),
+    id: "pf-cuerpos-leves",
+    titulo: "Cuerpos leves (Arcilla de papel)",
+    texto:
+      "El entretejido de la celulosa crea una estructura ligera pero resistente. Pensar en papel y en quemas rápidas como el raku alguna vez me pareció contradictorio, pero la fuerza de las fibras transforma la arcilla y hace que la incorporación de pulpa funcione especialmente bien en procesos experimentales.\n\nEn esta serie de objetos quise hacer visible esa tensión: el puente entre la aparente fragilidad del papel y la fuerza interna que habita en sus fibras.",
+    imagenes: portada(IMAGES.muestraRakuSilencio),
     orden: 3,
   },
   {
-    id: "pf-4",
-    titulo: "Hornera y proceso",
-    texto: "El calor como protagonista: preparación, carga y revelado de piezas.",
-    imagenes: img6(
-      IMAGES.muestraTallerHornera,
-      IMAGES.fuegos,
-      IMAGES.hero5,
-      IMAGES.muestraTormentaCraquelado,
-      IMAGES.quienSoy,
-      IMAGES.podcastCopia
-    ),
+    id: "pf-colaboracion-cubel",
+    titulo: "Colaboración CUBEL",
+    texto:
+      "Diseñamos estas piezas en colaboración con el diseñador de modas Humberto Cubides para el lanzamiento de su colección «La Colmena». En este proyecto exploramos acabados ricos en texturas a través de quemas experimentales, donde los materiales y el fuego tienen un papel fundamental en el resultado final.\n\nLa búsqueda se centró en tonos tierra, negros y superficies mates y rocosas, creando piezas con una presencia orgánica y táctil.",
+    imagenes: portada(IMAGES.muestraTormentaCraquelado),
     orden: 4,
   },
   {
-    id: "pf-5",
-    titulo: "Silencio raku",
-    texto: "Formas contenidas, negros profundos y un brillo que solo el humo puede dar.",
-    imagenes: img6(
-      IMAGES.muestraRakuSilencio,
-      IMAGES.muestraWabiSabi,
-      IMAGES.hero2,
-      IMAGES.hero6,
-      IMAGES.muestraSaggarHuella,
-      IMAGES.barro
-    ),
+    id: "pf-entre-humos",
+    titulo: "Entre humos",
+    texto: "Obra en desarrollo…",
+    imagenes: portada(IMAGES.muestraSaggarHuella),
     orden: 5,
-  },
-  {
-    id: "pf-6",
-    titulo: "Pieles de quema",
-    texto: "Experimentación con envolturas y atmósferas de saggar en gres.",
-    imagenes: img6(
-      "/Pieles%20de%20quemas%20experimentales..jpg",
-      IMAGES.muestraEnMuerte,
-      IMAGES.hero7,
-      IMAGES.hero3,
-      IMAGES.muestraFiqueRaiz,
-      IMAGES.reveladoCopia
-    ),
-    orden: 6,
-  },
-  {
-    id: "pf-7",
-    titulo: "Raíz y materia",
-    texto: "La arcilla y los materiales orgánicos como coautores del resultado final.",
-    imagenes: img6(
-      IMAGES.muestraFiqueRaiz,
-      IMAGES.barro,
-      IMAGES.hero,
-      IMAGES.hero4,
-      IMAGES.muestraTallerHornera,
-      IMAGES.muestraEsmaltesSala
-    ),
-    orden: 7,
-  },
-  {
-    id: "pf-8",
-    titulo: "Revelado",
-    texto: "El momento en que la pieza sale del fuego y muestra su piel definitiva.",
-    imagenes: img6(
-      IMAGES.revelado,
-      IMAGES.reveladoCopia,
-      IMAGES.muestraFormulacionEsmaltes,
-      IMAGES.hero5,
-      IMAGES.hero3,
-      IMAGES.muestraRakuSilencio
-    ),
-    orden: 8,
-  },
-  {
-    id: "pf-9",
-    titulo: "Serie horizontal",
-    texto: "Vistas del taller y piezas en distintos estados de acabado.",
-    imagenes: img6(
-      IMAGES.hero6,
-      IMAGES.hero7,
-      IMAGES.hero,
-      IMAGES.hero2,
-      IMAGES.hero3,
-      IMAGES.hero4
-    ),
-    orden: 9,
-  },
-  {
-    id: "pf-10",
-    titulo: "Muerte y renacimiento",
-    texto: "Piezas que hablan del ciclo del fuego: oxidación, craquelado y brillo.",
-    imagenes: img6(
-      IMAGES.muestraEnMuerte,
-      IMAGES.muestraTormentaCraquelado,
-      IMAGES.muestraSaggarHuella,
-      IMAGES.podcast,
-      IMAGES.quienSoy,
-      IMAGES.muestraWabiSabi
-    ),
-    orden: 10,
   },
 ];

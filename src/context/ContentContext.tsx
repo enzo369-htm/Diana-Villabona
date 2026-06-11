@@ -9,7 +9,10 @@ import {
   type ReactNode,
 } from "react";
 import type { ObraPortfolio, Pieza, Post, Taller } from "../types/content";
-import { obrasPortfolio as seedObrasPortfolio } from "../data/portfolioSeed";
+import {
+  obrasPortfolio as seedObrasPortfolio,
+  retiredObraIds,
+} from "../data/portfolioSeed";
 import { piezas as seedPiezas, posts as seedPosts, talleres as seedTalleres } from "../data/seed";
 import {
   clearCms,
@@ -106,7 +109,8 @@ export function ContentProvider({ children }: { children: ReactNode }) {
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
 
   const applyStored = useCallback((stored: StoredCms | null) => {
-    const deleted = new Set(stored?.deletedIds ?? []);
+    // Las obras retiradas se filtran siempre, aunque sigan guardadas en la nube.
+    const deleted = new Set([...(stored?.deletedIds ?? []), ...retiredObraIds]);
     setDeletedIds(stored?.deletedIds ?? []);
     setPiezas(
       mergePiezasWithSeed(stored?.piezas ?? null, cloneSeedPiezas(), deleted)
