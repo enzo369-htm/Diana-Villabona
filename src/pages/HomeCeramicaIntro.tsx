@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { VIIDEO } from "../images";
+import { VIDEO_HOME_DIANA } from "../images";
 
 export function HomeCeramicaIntro() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -63,7 +63,7 @@ export function HomeCeramicaIntro() {
             preload="auto"
             aria-label="Vídeo del taller"
           >
-            <source src={VIIDEO} type="video/mp4" />
+            <source src={VIDEO_HOME_DIANA} type="video/mp4" />
           </video>
         </div>
       </div>

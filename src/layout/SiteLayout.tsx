@@ -60,10 +60,7 @@ export function SiteLayout() {
 
         setScrollY(y);
 
-        if (isHome) {
-          // En home el nav alterna hero (texto rojo) ↔ barra blanca; no se oculta al bajar.
-          setHeaderHidden(false);
-        } else if (y <= 0) {
+        if (y <= 0) {
           setHeaderHidden(false);
         } else if (delta > SCROLL_DELTA && y > SCROLL_MIN_TO_HIDE) {
           setHeaderHidden(true);
@@ -78,7 +75,7 @@ export function SiteLayout() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, [pathname, isHome]);
+  }, [pathname]);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
