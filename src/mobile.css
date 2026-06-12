@@ -331,6 +331,11 @@
     font-size: clamp(0.72rem, 3.2vw, 0.82rem);
   }
 
+  .portfolio-band__link:hover .portfolio-band__title,
+  .portfolio-band__link:focus-visible .portfolio-band__title {
+    font-size: clamp(0.83rem, 3.68vw, 0.94rem);
+  }
+
   .talleres-intro {
     height: clamp(200px, 36svh, 320px);
   }
@@ -368,7 +373,7 @@
   }
 
   .site-footer__quote p {
-    font-size: clamp(1.38rem, 6.2vw, 1.72rem);
+    font-size: clamp(1.04rem, 4.65vw, 1.29rem);
     line-height: 1.42;
   }
 
