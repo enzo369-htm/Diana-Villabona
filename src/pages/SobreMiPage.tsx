@@ -11,10 +11,6 @@ export function SobreMiPage() {
 
   return (
     <div className="page-content page-content--pad sobre-mi">
-      <header className="page-header">
-        <h1>Acerca</h1>
-      </header>
-
       <div className="sobre-mi__split">
         <div className="sobre-mi__img">
           <img

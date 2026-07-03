@@ -347,10 +347,11 @@
 
   .sobre-mi__split {
     gap: 1.25rem;
+    margin-bottom: clamp(2rem, 4vh, 2.75rem);
   }
 
   .sobre-mi__img img {
-    max-height: min(52svh, 460px);
+    max-height: min(46.8svh, 414px);
     object-fit: cover;
     object-position: center 22%;
   }
@@ -363,6 +364,7 @@
 
   .sobre-mi__cta {
     margin-top: 0.65rem;
+    margin-bottom: 0;
   }
 
   /* —— Footer —— */
