@@ -8,15 +8,16 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { ObraPortfolio, Pieza, Post, Taller } from "../types/content";
+import type { AcercaContent, ObraPortfolio, Pieza, Post, Taller } from "../types/content";
 import {
   obrasPortfolio as seedObrasPortfolio,
   retiredObraIds,
 } from "../data/portfolioSeed";
-import { piezas as seedPiezas, posts as seedPosts, talleres as seedTalleres } from "../data/seed";
+import { acerca as seedAcerca, piezas as seedPiezas, posts as seedPosts, talleres as seedTalleres } from "../data/seed";
 import {
   clearCms,
   loadCms,
+  mergeAcercaWithSeed,
   mergeObrasPortfolioWithSeed,
   mergePiezasWithSeed,
   mergePostsWithSeed,
@@ -44,6 +45,7 @@ export type ContentContextValue = {
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
   talleres: Taller[];
+  acerca: AcercaContent;
   deletedIds: string[];
   cmsReady: boolean;
   cmsSyncState: CmsSyncState;
@@ -54,6 +56,7 @@ export type ContentContextValue = {
   setPosts: React.Dispatch<React.SetStateAction<Post[]>>;
   setObrasPortfolio: React.Dispatch<React.SetStateAction<ObraPortfolio[]>>;
   setTalleres: React.Dispatch<React.SetStateAction<Taller[]>>;
+  setAcerca: React.Dispatch<React.SetStateAction<AcercaContent>>;
   recordDeletion: (id: string) => void;
   resetToSeed: () => Promise<void>;
   pushCatalogToCloud: (catalog?: StoredCms) => Promise<void>;
@@ -79,14 +82,19 @@ function cloneSeedTalleres(): Taller[] {
   return JSON.parse(JSON.stringify(seedTalleres)) as Taller[];
 }
 
+function cloneSeedAcerca(): AcercaContent {
+  return JSON.parse(JSON.stringify(seedAcerca)) as AcercaContent;
+}
+
 export function buildCatalog(
   piezas: Pieza[],
   posts: Post[],
   obrasPortfolio: ObraPortfolio[],
   talleres: Taller[],
+  acerca: AcercaContent,
   deletedIds: string[] = []
 ): StoredCms {
-  return { piezas, posts, obrasPortfolio, talleres, deletedIds };
+  return { piezas, posts, obrasPortfolio, talleres, acerca, deletedIds };
 }
 
 export function ContentProvider({ children }: { children: ReactNode }) {
@@ -106,6 +114,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     cloneSeedObrasPortfolio
   );
   const [talleres, setTalleres] = useState<Taller[]>(cloneSeedTalleres);
+  const [acerca, setAcerca] = useState<AcercaContent>(cloneSeedAcerca);
   const [deletedIds, setDeletedIds] = useState<string[]>([]);
 
   const applyStored = useCallback((stored: StoredCms | null) => {
@@ -128,6 +137,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     setTalleres(
       mergeTalleresWithSeed(stored?.talleres ?? null, cloneSeedTalleres(), deleted)
     );
+    setAcerca(mergeAcercaWithSeed(stored?.acerca, cloneSeedAcerca()));
   }, []);
 
   // --- Cola de guardado serializada (evita race conditions y peticiones cruzadas) ---
@@ -169,10 +179,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       if (!usesCloud) return;
       const payload =
         catalog ??
-        buildCatalog(piezas, posts, obrasPortfolio, talleres, deletedIds);
+        buildCatalog(piezas, posts, obrasPortfolio, talleres, acerca, deletedIds);
       await queueSave(payload);
     },
-    [piezas, posts, obrasPortfolio, talleres, deletedIds, usesCloud, queueSave]
+    [piezas, posts, obrasPortfolio, talleres, acerca, deletedIds, usesCloud, queueSave]
   );
 
   const persistCatalog = useCallback(
@@ -198,10 +208,11 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      acerca,
       deletedIds
     );
     await persistCatalog(catalog);
-  }, [piezas, posts, obrasPortfolio, talleres, deletedIds, persistCatalog]);
+  }, [piezas, posts, obrasPortfolio, talleres, acerca, deletedIds, persistCatalog]);
 
   const recordDeletion = useCallback((id: string) => {
     if (!id) return;
@@ -270,6 +281,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      acerca,
       deletedIds
     );
 
@@ -298,6 +310,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     posts,
     obrasPortfolio,
     talleres,
+    acerca,
     deletedIds,
     cmsReady,
     usesCloud,
@@ -311,12 +324,14 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       cloneSeedPosts(),
       cloneSeedObrasPortfolio(),
       cloneSeedTalleres(),
+      cloneSeedAcerca(),
       []
     );
     setPiezas(seedCatalog.piezas);
     setPosts(seedCatalog.posts);
     setObrasPortfolio(seedCatalog.obrasPortfolio);
     setTalleres(seedCatalog.talleres);
+    setAcerca(seedCatalog.acerca);
     setDeletedIds([]);
     await persistCatalog(seedCatalog);
   }, [persistCatalog]);
@@ -327,6 +342,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      acerca,
       deletedIds,
       cmsReady,
       cmsSyncState,
@@ -337,6 +353,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       setPosts,
       setObrasPortfolio,
       setTalleres,
+      setAcerca,
       recordDeletion,
       resetToSeed,
       pushCatalogToCloud,
@@ -348,6 +365,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
       posts,
       obrasPortfolio,
       talleres,
+      acerca,
       deletedIds,
       cmsReady,
       cmsSyncState,

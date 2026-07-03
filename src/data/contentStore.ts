@@ -1,4 +1,4 @@
-import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
+import type { AcercaContent, ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 import { OBRAS_PORTFOLIO_IMAGENES, POST_IMAGENES_MAX, TECNICAS_PIEZA } from "../types/content";
 
 const STORAGE_KEY = "dvc-cms-catalogo-v1";
@@ -8,6 +8,7 @@ export type StoredCms = {
   posts: Post[];
   obrasPortfolio: ObraPortfolio[];
   talleres: Taller[];
+  acerca: AcercaContent;
   /** IDs de entradas (incluidas las del seed) que la clienta eliminó. */
   deletedIds: string[];
 };
@@ -31,6 +32,26 @@ function legacyHtmlToPlain(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+export function normalizeStoredAcerca(raw: unknown): AcercaContent {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  return {
+    texto: typeof o.texto === "string" ? o.texto : "",
+    imagen: typeof o.imagen === "string" ? o.imagen.trim() : "",
+  };
+}
+
+export function mergeAcercaWithSeed(
+  stored: AcercaContent | null | undefined,
+  seed: AcercaContent
+): AcercaContent {
+  if (!stored) return seed;
+  const normalized = normalizeStoredAcerca(stored);
+  return {
+    texto: normalized.texto.trim() || seed.texto,
+    imagen: normalized.imagen.trim() || seed.imagen,
+  };
 }
 
 export function normalizeStoredPost(raw: unknown): Post {
@@ -132,6 +153,7 @@ export function loadCms(): StoredCms | null {
       talleres: Array.isArray(data.talleres)
         ? data.talleres.map(normalizeStoredTaller)
         : [],
+      acerca: normalizeStoredAcerca((data as { acerca?: unknown }).acerca),
       deletedIds: normalizeDeletedIds(
         (data as { deletedIds?: unknown }).deletedIds
       ),

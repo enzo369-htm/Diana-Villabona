@@ -6,6 +6,7 @@ import {
 } from "../lib/supabaseClient";
 import {
   normalizeDeletedIds,
+  normalizeStoredAcerca,
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
   normalizeStoredTaller,
@@ -34,6 +35,7 @@ function normalizeRemotePayload(raw: unknown): StoredCms | null {
     talleres: Array.isArray(data.talleres)
       ? data.talleres.map(normalizeStoredTaller)
       : [],
+    acerca: normalizeStoredAcerca(data.acerca),
     deletedIds: normalizeDeletedIds(
       (data as { deletedIds?: unknown }).deletedIds
     ),

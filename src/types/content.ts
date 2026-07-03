@@ -62,6 +62,14 @@ export interface ObraPortfolio {
 
 export const OBRAS_PORTFOLIO_IMAGENES = 6;
 
+/** Contenido editable de la página Acerca. */
+export interface AcercaContent {
+  /** Texto plano; párrafos separados por línea en blanco. */
+  texto: string;
+  /** URL de la foto principal. */
+  imagen: string;
+}
+
 export interface HomeConfig {
   /** Rutas de imágenes del hero (orden = orden en el carrusel). */
   heroImagenes: string[];

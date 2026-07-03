@@ -1,16 +1,18 @@
 import { Link } from "react-router-dom";
 import { useCallback, useRef, useState } from "react";
-import type { ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
+import type { AcercaContent, ObraPortfolio, Pieza, Post, Taller, TecnicaPieza } from "../types/content";
 
 import { OBRAS_PORTFOLIO_IMAGENES, POST_IMAGENES_MAX, TECNICAS_PIEZA } from "../types/content";
 import { buildCatalog, useContent } from "../context/ContentContext";
 import {
+  normalizeStoredAcerca,
   normalizeStoredObraPortfolio,
   normalizeStoredPost,
   normalizeStoredTaller,
 } from "../data/contentStore";
 import { IMAGE_MAX_SOURCE_BYTES, IMAGE_MAX_SOURCE_MB } from "../data/remoteCms";
 import { cmsImageHelpText, resolveCmsImageFromFile } from "../utils/cmsImage";
+import { AdminAcercaTab } from "./AdminAcercaTab";
 import { AdminPortfolioTab } from "./AdminPortfolioTab";
 import { AdminTalleresTab } from "./AdminTalleresTab";
 
@@ -85,6 +87,7 @@ export function AdminPage() {
     posts,
     obrasPortfolio,
     talleres,
+    acerca,
     deletedIds,
     cmsSyncState,
     cmsSyncError,
@@ -94,6 +97,7 @@ export function AdminPage() {
     setPosts,
     setObrasPortfolio,
     setTalleres,
+    setAcerca,
     recordDeletion,
     resetToSeed,
     pushCatalogToCloud,
@@ -102,7 +106,7 @@ export function AdminPage() {
   } = useContent();
   const [savingObra, setSavingObra] = useState(false);
   const [tab, setTab] = useState<
-    "piezas" | "bitacora" | "portfolio" | "talleres"
+    "piezas" | "bitacora" | "portfolio" | "talleres" | "acerca"
   >("piezas");
   const [piezaDraft, setPiezaDraft] = useState<Pieza | null>(null);
   const [postDraft, setPostDraft] = useState<Post | null>(null);
@@ -276,7 +280,7 @@ export function AdminPage() {
         ? obrasPortfolio.map((o, i) => (i === idx ? next : o))
         : [...obrasPortfolio, next];
 
-    const catalog = buildCatalog(piezas, posts, nextObras, talleres, deletedIds);
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres, acerca, deletedIds);
 
     setSavingObra(true);
     try {
@@ -294,6 +298,7 @@ export function AdminPage() {
     piezas,
     posts,
     talleres,
+    acerca,
     deletedIds,
     persistCatalog,
     savingObra,
@@ -309,7 +314,7 @@ export function AdminPage() {
     const nextDeleted = deletedIds.includes(removed.id)
       ? deletedIds
       : [...deletedIds, removed.id];
-    const catalog = buildCatalog(piezas, posts, nextObras, talleres, nextDeleted);
+    const catalog = buildCatalog(piezas, posts, nextObras, talleres, acerca, nextDeleted);
 
     setSavingObra(true);
     try {
@@ -330,6 +335,7 @@ export function AdminPage() {
     piezas,
     posts,
     talleres,
+    acerca,
     deletedIds,
     recordDeletion,
     persistCatalog,
@@ -371,7 +377,7 @@ export function AdminPage() {
     const blob = new Blob(
       [
         JSON.stringify(
-          { piezas, posts, obrasPortfolio, talleres, deletedIds },
+          { piezas, posts, obrasPortfolio, talleres, acerca, deletedIds },
           null,
           2
         ),
@@ -385,7 +391,7 @@ export function AdminPage() {
     a.download = "diana-villabona-catalogo-bitacora.json";
     a.click();
     URL.revokeObjectURL(a.href);
-  }, [piezas, posts, obrasPortfolio, talleres, deletedIds]);
+  }, [piezas, posts, obrasPortfolio, talleres, acerca, deletedIds]);
 
   const importJson = useCallback(
     (file: File | null) => {
@@ -398,6 +404,7 @@ export function AdminPage() {
             posts: Post[];
             obrasPortfolio: ObraPortfolio[];
             talleres: Taller[];
+            acerca?: AcercaContent;
           }>;
           if (Array.isArray(d.piezas) && Array.isArray(d.posts)) {
             setPiezas(d.piezas);
@@ -412,6 +419,9 @@ export function AdminPage() {
                 ? d.talleres.map(normalizeStoredTaller)
                 : []
             );
+            if (d.acerca) {
+              setAcerca(normalizeStoredAcerca(d.acerca));
+            }
             setPiezaDraft(null);
             setPostDraft(null);
             setObraDraft(null);
@@ -423,7 +433,7 @@ export function AdminPage() {
       };
       reader.readAsText(file);
     },
-    [setPiezas, setPosts, setObrasPortfolio, setTalleres]
+    [setPiezas, setPosts, setObrasPortfolio, setTalleres, setAcerca]
   );
 
   return (
@@ -431,7 +441,7 @@ export function AdminPage() {
       <header className="page-header">
         <h1>Administración</h1>
         <p className="page-header__lede">
-          Edición del catálogo, portafolio, encuentros y bitácora. Los cambios y las fotos
+          Edición del catálogo, portafolio, encuentros, acerca y bitácora. Los cambios y las fotos
           quedan guardados para todo el sitio (celular y computadora).
         </p>
         <div
@@ -532,6 +542,15 @@ export function AdminPage() {
           onClick={() => setTab("talleres")}
         >
           Encuentros
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "acerca"}
+          className={tab === "acerca" ? "admin-tab admin-tab--on" : "admin-tab"}
+          onClick={() => setTab("acerca")}
+        >
+          Acerca
         </button>
         <button
           type="button"
@@ -757,6 +776,8 @@ export function AdminPage() {
           onSave={saveTaller}
           onDelete={deleteTaller}
         />
+      ) : tab === "acerca" ? (
+        <AdminAcercaTab acerca={acerca} setAcerca={setAcerca} />
       ) : (
         <div className="admin-split">
           <aside className="admin-list-panel">
