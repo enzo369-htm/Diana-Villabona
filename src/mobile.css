@@ -350,7 +350,7 @@
   }
 
   .sobre-mi__img img {
-    max-height: min(48svh, 420px);
+    max-height: min(52svh, 460px);
     object-fit: cover;
     object-position: center 22%;
   }
