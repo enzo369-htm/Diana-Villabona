@@ -1,7 +1,9 @@
-import { CONTACT_EMAIL } from "../siteConfig";
+import { whatsappLink } from "../siteConfig";
 import { useContent } from "../context/ContentContext";
 import { IMAGES } from "../images";
 import { plainTextToSafeHtml } from "../utils/plainText";
+
+const ACERCA_WA = whatsappLink("Hola Diana, me gustaría conversar contigo.");
 
 export function SobreMiPage() {
   const { acerca } = useContent();
@@ -33,7 +35,9 @@ export function SobreMiPage() {
           <div className="sobre-mi__cta">
             <a
               className="btn-pill btn-pill--accent"
-              href={`mailto:${CONTACT_EMAIL}`}
+              href={ACERCA_WA}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               ¿Hablamos?
             </a>
