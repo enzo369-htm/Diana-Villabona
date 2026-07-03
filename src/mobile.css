@@ -349,8 +349,20 @@
     gap: 1.25rem;
   }
 
+  .sobre-mi__img img {
+    max-height: min(44svh, 380px);
+    object-fit: cover;
+    object-position: center 22%;
+  }
+
   .sobre-mi__text p {
-    font-size: 0.98rem;
+    font-size: 0.92rem;
+    line-height: 1.58;
+    margin-bottom: 0.7rem;
+  }
+
+  .sobre-mi__cta {
+    margin-top: 0.65rem;
   }
 
   /* —— Footer —— */

@@ -3574,9 +3574,41 @@ article.page-content.page-content--pad.editorial {
 }
 
 @media (min-width: 800px) {
+  .sobre-mi.page-content--pad {
+    padding-top: clamp(3.75rem, 7.5vw, 4.5rem);
+    padding-bottom: clamp(1.25rem, 2.5vh, 2rem);
+  }
+
+  .sobre-mi .page-header {
+    margin-bottom: clamp(0.85rem, 1.8vh, 1.15rem);
+  }
+
+  .sobre-mi .page-header h1 {
+    font-size: clamp(1.6rem, 2.8vw, 1.95rem);
+  }
+
   .sobre-mi__split {
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
     align-items: start;
+    gap: clamp(1.1rem, 2vw, 1.45rem);
+  }
+
+  .sobre-mi__img img {
+    max-height: min(54dvh, 540px);
+    width: 100%;
+    object-fit: cover;
+    object-position: center 22%;
+  }
+
+  .sobre-mi__text p {
+    font-size: clamp(0.82rem, 0.88vw, 0.9rem);
+    line-height: 1.58;
+    margin-bottom: 0.6rem;
+    max-width: none;
+  }
+
+  .sobre-mi__cta {
+    margin-top: 0.65rem;
   }
 }
 
