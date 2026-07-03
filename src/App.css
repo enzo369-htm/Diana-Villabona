@@ -3594,7 +3594,7 @@ article.page-content.page-content--pad.editorial {
   }
 
   .sobre-mi__img img {
-    max-height: min(54dvh, 540px);
+    max-height: min(60dvh, 600px);
     width: 100%;
     object-fit: cover;
     object-position: center 22%;
