@@ -4,13 +4,10 @@ import {
   DEVELOPER_NAME,
   DEVELOPER_PORTFOLIO_URL,
   INSTAGRAM_URL,
-  NAV_ITEMS,
+  PUBLIC_NAV_ITEMS,
 } from "../siteConfig";
 
-const FOOTER_QUOTE =
-  "Lo más hermoso y profundo de la cerámica es dejarse usar como medio para que la naturaleza se exprese a sí misma.";
-
-const sections = NAV_ITEMS;
+const sections = PUBLIC_NAV_ITEMS;
 
 function MailIcon() {
   return (
@@ -52,10 +49,6 @@ export function SiteFooter() {
       <div className="site-footer__surface">
         <div className="site-footer__inner">
           <div className="site-footer__body">
-            <blockquote className="site-footer__quote">
-              <p>{FOOTER_QUOTE}</p>
-            </blockquote>
-
             <div className="site-footer__row">
               <nav className="site-footer__nav" aria-label="Secciones del sitio">
                 <ul className="site-footer__nav-list">

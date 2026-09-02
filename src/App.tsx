@@ -11,6 +11,7 @@ import { TalleresPage } from "./pages/TalleresPage";
 import { SobreMiPage } from "./pages/SobreMiPage";
 import { ContactoPage } from "./pages/ContactoPage";
 import { AdminGate } from "./admin/AdminGate";
+import { ENCUENTROS_PUBLIC } from "./siteConfig";
 
 export default function App() {
   return (
@@ -24,7 +25,12 @@ export default function App() {
           <Route path="piezas/:id" element={<PiezaDetailPage />} />
           <Route path="bitacora" element={<BitacoraPage />} />
           <Route path="bitacora/:id" element={<BitacoraPostPage />} />
-          <Route path="talleres" element={<TalleresPage />} />
+          <Route
+            path="talleres"
+            element={
+              ENCUENTROS_PUBLIC ? <TalleresPage /> : <Navigate to="/" replace />
+            }
+          />
           <Route path="sobre-mi" element={<SobreMiPage />} />
           <Route path="contacto" element={<ContactoPage />} />
           <Route path="admin" element={<AdminGate />} />

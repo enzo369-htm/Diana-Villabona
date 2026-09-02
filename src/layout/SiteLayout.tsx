@@ -1,14 +1,14 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SiteFooter } from "../components/SiteFooter";
-import { NAV_ITEMS, SITE_NAME } from "../siteConfig";
+import { PUBLIC_NAV_ITEMS, SITE_NAME } from "../siteConfig";
 
 const SCROLL_DELTA = 8;
 const SCROLL_MIN_TO_HIDE = 72;
 /** En home: nav flotante solo en el tope absoluto del hero. */
 const HOME_HERO_NAV_TOP = 8;
 
-const nav = NAV_ITEMS;
+const nav = PUBLIC_NAV_ITEMS;
 
 export function SiteLayout() {
   const { pathname, hash } = useLocation();

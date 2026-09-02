@@ -11,6 +11,13 @@ export const NAV_ITEMS = [
   { to: "/sobre-mi", label: "Acerca" },
 ] as const;
 
+/** `false` oculta Encuentros en la web pública (nav, footer y ruta). El admin no se toca. */
+export const ENCUENTROS_PUBLIC = false;
+
+export const PUBLIC_NAV_ITEMS = NAV_ITEMS.filter(
+  (item) => ENCUENTROS_PUBLIC || item.to !== "/talleres"
+);
+
 export const CONTACT_EMAIL = "villabonadiana2@gmail.com";
 
 export const INSTAGRAM_URL = "https://www.instagram.com/dianavillabonaceramica";
