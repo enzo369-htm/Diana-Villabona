@@ -63,7 +63,7 @@ export function ContactoPage() {
               name="mensaje"
               value={mensaje}
               onChange={(e) => setMensaje(e.target.value)}
-              placeholder="Contanos qué te movió a escribir..."
+              placeholder="Cuéntame que te movió a escribir"
               rows={5}
               required
             />
